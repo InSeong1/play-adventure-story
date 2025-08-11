@@ -18,11 +18,7 @@ def get_file_path(file_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     full_path = os.path.join(script_dir, "assets", file_path)
     
-    # 디버깅을 위한 출력 (주석처리)
-    # print(f"DEBUG: script_dir = {script_dir}")
-    # print(f"DEBUG: file_path = {file_path}")
-    # print(f"DEBUG: full_path = {full_path}")
-    # print(f"DEBUG: file exists = {os.path.exists(full_path)}")
+
     
     return full_path
 
@@ -39,15 +35,14 @@ def get_base64_audio(file_path):
 def get_base64_image(file_path):
     """이미지 파일을 base64로 인코딩하는 함수"""
     try:
-        # print(f"DEBUG: get_base64_image called with: {file_path}")
-        # print(f"DEBUG: file exists: {os.path.exists(file_path)}")
+
         with open(file_path, "rb") as image_file:
             image_data = image_file.read()
             image_base64 = base64.b64encode(image_data).decode()
-            # print(f"DEBUG: image loaded successfully, size: {len(image_data)} bytes")
+
             return image_base64
     except Exception as e:
-        # print(f"DEBUG: Error loading image: {str(e)}")
+
         return None
 
 def play_bgm(audio_file, autoplay=True, loop=True):
@@ -92,7 +87,38 @@ def render_common_menu():
         st.rerun()
     
     if st.sidebar.button("🗺️ 지도 보기", use_container_width=True):
-        st.session_state.current_page = "adventure_map"
+        # 지도 팝업 표시 상태를 토글
+        if 'show_map_popup' not in st.session_state:
+            st.session_state.show_map_popup = False
+        st.session_state.show_map_popup = not st.session_state.show_map_popup
+        st.rerun()
+    
+    if st.sidebar.button("📝 극본의 특성", use_container_width=True):
+        # 극본의 특성 팝업 표시 상태를 토글
+        if 'show_script_popup' not in st.session_state:
+            st.session_state.show_script_popup = False
+        st.session_state.show_script_popup = not st.session_state.show_script_popup
+        st.rerun()
+    
+    if st.sidebar.button("🎭 연극의 특성", use_container_width=True):
+        # 연극의 특성 팝업 표시 상태를 토글
+        if 'show_theater_popup' not in st.session_state:
+            st.session_state.show_theater_popup = False
+        st.session_state.show_theater_popup = not st.session_state.show_theater_popup
+        st.rerun()
+    
+    if st.sidebar.button("📖 사용 방법", use_container_width=True):
+        # 사용 방법 팝업 표시 상태를 토글
+        if 'show_help_popup' not in st.session_state:
+            st.session_state.show_help_popup = False
+        st.session_state.show_help_popup = not st.session_state.show_help_popup
+        st.rerun()
+    
+    if st.sidebar.button("❓ 자주하는 질문", use_container_width=True):
+        # 자주하는 질문 팝업 표시 상태를 토글
+        if 'show_faq_popup' not in st.session_state:
+            st.session_state.show_faq_popup = False
+        st.session_state.show_faq_popup = not st.session_state.show_faq_popup
         st.rerun()
 
 def clear_village(village_number):
@@ -116,8 +142,8 @@ def show_badge_popup(village_number):
     # 뱃지 이미지 경로 설정
     badge_paths = {
         1: "뱃지 모음/1_뱃지_시작의 마을.png",
-        2: "뱃지 모음/2_뱃지_이야기 숲.png",
-        3: "뱃지 모음/3_뱃지_준비의 광장.png",
+        2: "뱃지 모음/2_이야기 숲 뱃지 획득.png",
+        3: "뱃지 모음/3_준비의 광장 뱃지 획득.png",
         4: "뱃지 모음/4_뱃지_환호의 극장.png",
         5: "뱃지 모음/5_뱃지_추억의 언덕.png"
     }

@@ -1,10 +1,13 @@
 import streamlit as st
 import os
 import base64
-from utils import get_file_path, get_base64_image
+from utils import get_file_path, get_base64_image, render_common_menu
 
 def story_forest_page():
     """이야기 숲 페이지"""
+    
+    # 햄버거 메뉴 (사이드바)
+    render_common_menu()
     
     # 페이지 제목
     st.markdown("""

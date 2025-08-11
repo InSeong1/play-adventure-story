@@ -16,7 +16,7 @@ def village_page():
     
     # 초대장 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
     invitation_path = get_file_path("사진 모음/초대장/1_시작의 마을 초대장.png")
-    # st.write(f"DEBUG 초대장 경로: {invitation_path}")
+
     invitation_image = get_base64_image(invitation_path)
     
     if invitation_image:
@@ -36,7 +36,7 @@ def village_page():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("📜 초대장 듣기", key="listen_invitation", 
-                    help="클릭하여 초대장 나레이션을 들을 수 있습니다",
+                    help="클릭하여 초대장을 들을 수 있습니다",
                     use_container_width=True):
             st.session_state.show_narration = True
             # BGM 음량을 절반으로 줄임
@@ -49,7 +49,7 @@ def village_page():
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.markdown("**🎧 나레이션 재생**")
+            st.markdown("**🎧 초대장 듣기**")
             # 나레이션 오디오 파일 재생 (BGM과 함께)
             try:
                 with open(get_file_path("나레이션 소리 모음/1.시작의 마을.mp3"), "rb") as audio_file:
@@ -75,11 +75,11 @@ def village_page():
     # 입력 폼 제목
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
-        <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">🎭 연극 대본 계획서 작성</h2>
-        <p style="color: #666; font-size: 1.1rem;">연극 대본 작성을 위한 기본 정보를 입력해주세요</p>
+        <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">🎭 연극 대본 계획서 작성하기</h2>
+        <p style="color: #666; font-size: 1.1rem;">연극 대본 작성을 위한 기본 정보를 입력해주세요.</p>
     </div>
     """, unsafe_allow_html=True)
-    
+
     # 입력 폼을 2열로 배치
     col1, col2 = st.columns(2)
     
@@ -90,22 +90,29 @@ def village_page():
             min_value=1,
             max_value=20,
             value=1,
-            help="연극에 등장할 인물의 수를 입력하세요"
+            help="연극에 등장할 인물의 수를 입력하세요."
         )
         
         # 등장인물의 이름
-        st.markdown("📝 **등장인물의 이름** (쉼표로 구분)")
+        st.markdown("📝 **등장인물의 이름**")
         character_names = st.text_area(
-            "등장인물들의 이름을 쉼표(,)로 구분하여 입력하세요",
+            "등장인물들의 이름을 쉼표(,)로 구분하여 입력하세요.",
             placeholder="예: 홍길동, 김철수, 이영희...",
-            help="여러 등장인물의 이름을 쉼표(,)로 구분하여 입력하세요"
+            help="여러 등장인물의 이름을 쉼표(,)로 구분하여 입력하세요."
         )
         
         # 연극 장르 입력
         genre = st.text_input(
             "🎬 연극 장르",
             placeholder="예: 드라마, 코미디, 로맨스, 스릴러, 판타지, 역사극, 뮤지컬, 실험극, 기타...",
-            help="연극의 장르를 직접 입력하세요"
+            help="연극의 장르를 직접 입력하세요."
+        )
+        
+        # 연극 주제 입력 (왼쪽 칼럼 제일 아래)
+        theme = st.text_input(
+            "🎯 연극 주제",
+            placeholder="예: 착한 일을 하면 복을 받는다",
+            help="'착한 일을 하면 복을 받는다.' '이야기 흐름 예시는 '가난하지만 마음씨 착한 주인공이 길에서 잃어버린 지갑을 주워 주인에게 돌려준다. 지갑 주인이 선행에 감동해 주인공이 위기에 처했을 때 도와준다.'"
         )
     
     with col2:
@@ -113,23 +120,23 @@ def village_page():
         time_background = st.text_input(
             "⏰ 시간적 배경",
             placeholder="예: 2024년, 조선시대, 미래...",
-            help="연극이 일어나는 시대나 시간을 입력하세요"
+            help="연극이 일어나는 시대나 시간을 입력하세요. 배경이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
         # 공간적 배경
         space_background = st.text_input(
             "🏛️ 공간적 배경",
-            placeholder="예: 서울, 판타지 세계, 우주선...",
-            help="연극이 일어나는 장소나 공간을 입력하세요"
+            placeholder="예: 서울, 울산대공원, 구름 위, 우주선...",
+            help="연극이 일어나는 장소나 공간을 입력하세요. 시간이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
         # 공연 시간 (분 단위)
         performance_time = st.number_input(
             "⏱️ 공연 시간 (분)",
-            min_value=10,
-            max_value=180,
-            value=60,
-            help="예상 공연 시간을 분 단위로 입력하세요"
+            min_value=1,
+            max_value=60,
+            value=10,
+            help="예상 공연 시간을 분 단위로 입력하세요."
         )
         
         # 장면 수 (오른쪽 칼럼으로 이동)
@@ -140,79 +147,138 @@ def village_page():
             value=1,
             help="연극의 총 장면 수를 입력하세요"
         )
-    
-    # 입력 완료 버튼
-    st.markdown("<br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        # 모든 필수 입력 확인
-        required_fields_filled = (
-            character_names.strip() != "" and
-            genre != "" and
-            time_background.strip() != "" and
-            space_background.strip() != ""
-        )
         
-        if required_fields_filled:
-            if st.button("✅ 입력 완료", key="submit_form", 
-                        help="모든 정보가 입력되었습니다. 시나리오를 생성합니다.",
-                        use_container_width=True):
-                
-                st.success("🎉 모든 정보가 입력되었습니다! 시나리오 생성 중...")
-                
-                # 프롬프트 파일 읽기
-                try:
-                    with open(get_file_path("프롬프트/1.시작의 마을.txt"), "r", encoding="utf-8") as prompt_file:
-                        prompt_template = prompt_file.read()
-                    
-                    # 프롬프트에 입력값 치환
-                    prompt = prompt_template.format(
-                        character_names=character_names,
-                        genre=genre,
-                        time_background=time_background,
-                        space_background=space_background,
-                        performance_time=performance_time,
-                        scene_count=scene_count
-                    )
-                    
-                    # OpenAI API를 사용하여 시나리오 생성
-                    with st.spinner("🤖 주어진 내용을 바탕으로 시나리오를 생성하고 있어요..."):
-                        generated_scenario = generate_play_scenario(prompt)
-                    
-                    # 생성된 시나리오 표시
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    st.markdown("### 🎭 생성된 연극 시나리오")
-                    st.markdown("---")
-                    
-                    # 생성된 시나리오를 표시
-                    st.markdown(generated_scenario)
-                    
-                    # 생성된 시나리오를 세션 상태에 저장
-                    st.session_state.generated_scenario = generated_scenario
-                    
-                except Exception as e:
-                    st.error(f"프롬프트 파일을 불러올 수 없습니다: {str(e)}")
+        # 이야기 흐름 입력 (오른쪽 칼럼 가장 밑)
+        st.markdown("<br>", unsafe_allow_html=True)
+        story_flow = st.text_area(
+            "📖 이야기 흐름",
+            placeholder="예: 가난하지만 마음씨 착한 주인공이 길에서 잃어버린 지갑을 주워 주인에게 돌려준다. 지갑 주인이 선행에 감동해 주인공이 위기에 처했을 때 도와준다.",
+            help="연극의 주요 이야기 흐름을 자세히 설명해주세요.",
+            height=100
+        )
     
-    # 마을 클리어 버튼을 항상 표시 (필수 입력과 관계없이)
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("### 🏆 마을 클리어")
-    st.markdown("---")
+    # 입력 완료 버튼 (양쪽 칼럼을 합쳐서 큰 버튼)
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("✅ 입력 완료", key="submit_form", 
+                help="입력한 정보를 저장합니다.",
+                use_container_width=True):
+                
+                # 검증 로직
+                validation_errors = []
+                
+                # 1. 필수 입력 확인
+                if character_names.strip() == "":
+                    validation_errors.append("등장인물 이름을 입력해주세요.")
+                if genre.strip() == "":
+                    validation_errors.append("연극 장르를 입력해주세요.")
+                if time_background.strip() == "":
+                    validation_errors.append("시간적 배경을 입력해주세요.")
+                if space_background.strip() == "":
+                    validation_errors.append("공간적 배경을 입력해주세요.")
+                if theme.strip() == "":
+                    validation_errors.append("연극 주제를 입력해주세요.")
+                if story_flow.strip() == "":
+                    validation_errors.append("이야기 흐름을 입력해주세요.")
+                
+                # 2. 등장인물 수와 이름 개수 확인
+                if character_names.strip() != "":
+                    name_list = [name.strip() for name in character_names.split(',') if name.strip()]
+                    if len(name_list) != character_count:
+                        validation_errors.append(f"등장인물 수({character_count}명)와 입력한 이름 개수({len(name_list)}명)가 일치하지 않습니다.")
+                
+                # 3. 공연시간과 장면 수 비율 확인 (5분당 1장면 이상이면 경고)
+                max_recommended_scenes = performance_time // 5
+                if scene_count > max_recommended_scenes:
+                    validation_errors.append(f"공연시간 {performance_time}분에 비해 장면 수({scene_count}개)가 많습니다. 권장 장면 수는 {max_recommended_scenes}개 이하입니다.")
+                
+                # 검증 오류가 있으면 탭으로 구분해서 표시
+                if validation_errors:
+                    st.error("⚠️ 입력 정보를 확인해주세요:")
+                    
+                    # 오류 유형별로 탭 생성
+                    tab_names = []
+                    if any("등장인물" in error for error in validation_errors):
+                        tab_names.append("👥 등장인물")
+                    if any("장르" in error or "배경" in error or "주제" in error or "이야기" in error for error in validation_errors):
+                        tab_names.append("📝 기본 정보")
+                    if any("장면" in error for error in validation_errors):
+                        tab_names.append("🎭 공연 설정")
+                    
+                    if len(tab_names) > 1:
+                        tabs = st.tabs(tab_names)
+                        
+                        # 등장인물 탭
+                        if "👥 등장인물" in tab_names:
+                            tab_index = tab_names.index("👥 등장인물")
+                            with tabs[tab_index]:
+                                for error in validation_errors:
+                                    if "등장인물" in error:
+                                        st.write(f"• {error}")
+                        
+                        # 기본 정보 탭
+                        if "📝 기본 정보" in tab_names:
+                            tab_index = tab_names.index("📝 기본 정보")
+                            with tabs[tab_index]:
+                                for error in validation_errors:
+                                    if any(keyword in error for keyword in ["장르", "배경", "주제", "이야기"]):
+                                        st.write(f"• {error}")
+                        
+                        # 공연 설정 탭
+                        if "🎭 공연 설정" in tab_names:
+                            tab_index = tab_names.index("🎭 공연 설정")
+                            with tabs[tab_index]:
+                                for error in validation_errors:
+                                    if "장면" in error:
+                                        st.write(f"• {error}")
+                    else:
+                        # 탭이 하나만 필요한 경우
+                        for error in validation_errors:
+                            st.write(f"• {error}")
+                    
+                    # 주의사항 표시
+                    st.markdown("""
+                    <div style="background-color: #FFF3CD; border: 1px solid #FFEAA7; border-radius: 5px; padding: 1rem; margin: 1rem 0;">
+                        <p style="color: #856404; font-weight: bold; margin: 0;">⚠️ 주의사항:</p>
+                        <ul style="color: #856404; margin: 0.5rem 0 0 0;">
+                            <li>잔인하거나 폭력적인 내용은 포함하지 마세요.</li>
+                            <li>모든 필수 항목을 정확히 입력해주세요.</li>
+                            <li>등장인물 수와 이름 개수를 일치시켜주세요.</li>
+                            <li>공연시간에 비해 장면 수가 너무 많지 않도록 설정해주세요.</li>
+                        </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # 검증 통과 시 다음 마을로 진행
+                else:
+                    st.success("🎉 연극에 필요한 기본 정보들을 입력 받았어요!\n다음 마을로 모험을 계속해볼까요?")
+                    
+                    # 입력된 값들을 세션에 저장
+                    st.session_state.village_inputs = {
+                        'character_count': character_count,
+                        'character_names': character_names,
+                        'genre': genre,
+                        'time_background': time_background,
+                        'space_background': space_background,
+                        'performance_time': performance_time,
+                        'scene_count': scene_count,
+                        'theme': theme,
+                        'story_flow': story_flow
+                    }
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🏆 마을 클리어하기", key="clear_village", 
-                    help="이 마을을 클리어하고 뱃지를 획득합니다",
+            # 다음 마을로 모험 떠나기 버튼 (검증 통과 후에만 표시)
+    if 'village_inputs' in st.session_state:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🚀 다음 마을로 모험 떠나기", key="next_village", 
+                    help="다음 마을로 이동합니다.",
                     use_container_width=True):
-            # 시작의 마을 클리어 (1번 마을)
-            from utils import clear_village
-            clear_village(1)
+            # 시작의 마을 클리어 (자동으로)
+            if 'cleared_villages' not in st.session_state:
+                st.session_state.cleared_villages = []
+            if 1 not in st.session_state.cleared_villages:
+                st.session_state.cleared_villages.append(1)
             
+            # feedback_age.py 페이지로 이동
             st.session_state.current_page = "feedback_age"
             st.rerun()
     
-    # 필수 입력 확인 메시지
-    if not required_fields_filled:
-        st.warning("⚠️ 필수 입력 정보를 모두 채워주세요!")
-        st.info("등장인물 이름, 연극 장르, 시간적 배경, 공간적 배경은 반드시 입력해야 합니다.")
-    
-    # 네비게이션 버튼들은 사이드바에 있으므로 제거
+  

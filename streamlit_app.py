@@ -6,6 +6,10 @@ from pages.adventure_map_page import adventure_map_page
 from pages.village_page import village_page
 from pages.story_forest_page import story_forest_page
 from pages.feedback_age import feedback_age_page
+from pages.prepare_page import prepare_page
+from pages.hwanho_page import hwanho_page
+from pages.memory_page import memory_page
+from pages.summary_page import summary_page
 
 # 페이지 설정
 st.set_page_config(
@@ -74,6 +78,29 @@ window.addEventListener('load', function() {
         const decoration = document.querySelector('[data-testid="stDecoration"]');
         if (decoration) decoration.style.display = 'none';
     }, 1000);
+    
+    // 지도 팝업 닫기 함수
+    function closeMapPopup() {
+        const popup = document.getElementById('map-popup-overlay');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+    
+    // ESC 키로 팝업 닫기
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeMapPopup();
+        }
+    });
+    
+    // 팝업 외부 클릭으로 닫기
+    document.addEventListener('click', function(event) {
+        const popup = document.getElementById('map-popup-overlay');
+        if (popup && event.target === popup) {
+            closeMapPopup();
+        }
+    });
 });
 </script>
 """, unsafe_allow_html=True)
@@ -217,31 +244,20 @@ st.markdown("""
         backdrop-filter: blur(10px) !important;
     }
     
-    .audio-player-container {
-        position: fixed;
-        top: 5px;
-        right: 5px;
-        z-index: 1000;
-        background: rgba(0, 0, 0, 0.7);
-        border-radius: 3px;
-        padding: 2px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        max-width: 40px;
-        text-align: center;
-        font-size: 6px;
+    /* BGM 오디오 컨트롤을 작게 만들기 위한 스타일 */
+    .stAudio {
+        width: 100px !important;
+        height: 40px !important;
     }
     
-    .audio-player-container .audio-label {
-        font-size: 6px;
-        color: white;
-        margin-bottom: 1px;
-        font-weight: bold;
+    .stAudio > div {
+        width: 100px !important;
+        height: 40px !important;
     }
     
-    .audio-player-container audio {
-        width: 35px;
-        height: 20px;
-        transform: scale(0.8);
+    .stAudio audio {
+        width: 100px !important;
+        height: 40px !important;
     }
     
     /* 오른쪽 뱃지 보드 사이드바 스타일 */
@@ -332,6 +348,322 @@ st.markdown("""
         height: auto;
         object-fit: contain;
     }
+    
+    /* 지도 팝업 스타일 */
+    .map-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .map-popup-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        max-height: 80vh;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        animation: popupFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes popupFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .map-popup-header {
+        background: linear-gradient(45deg, #4ECDC4, #44A08D);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 2px solid #44A08D;
+        position: relative;
+    }
+    
+    .map-popup-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .map-popup-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .map-popup-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: contain;
+    }
+    
+    /* 사용 방법 팝업 스타일 */
+    .help-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .help-popup-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        max-height: 80vh;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        animation: popupFadeIn 0.3s ease-out;
+    }
+    
+    .help-popup-header {
+        background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 2px solid #FF8E53;
+        position: relative;
+    }
+    
+    .help-popup-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .help-popup-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .help-popup-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: contain;
+    }
+    
+    /* 자주하는 질문 팝업 스타일 */
+    .faq-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .faq-popup-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        max-height: 80vh;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        animation: popupFadeIn 0.3s ease-out;
+    }
+    
+    .faq-popup-header {
+        background: linear-gradient(45deg, #A8E6CF, #7FCDCD);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 2px solid #7FCDCD;
+        position: relative;
+    }
+    
+    .faq-popup-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .faq-popup-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* 극본의 특성 팝업 스타일 */
+    .script-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .script-popup-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        max-height: 80vh;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        animation: popupFadeIn 0.3s ease-out;
+    }
+    
+    .script-popup-header {
+        background: linear-gradient(45deg, #9B59B6, #8E44AD);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 2px solid #8E44AD;
+        position: relative;
+    }
+    
+    .script-popup-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .script-popup-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .script-popup-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: contain;
+    }
+    
+    /* 연극의 특성 팝업 스타일 */
+    .theater-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+    
+    .theater-popup-content {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        max-width: 70vw;
+        max-height: 80vh;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        animation: popupFadeIn 0.3s ease-out;
+    }
+    
+    .theater-popup-header {
+        background: linear-gradient(45deg, #E74C3C, #C0392B);
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        border-bottom: 2px solid #C0392B;
+        position: relative;
+    }
+    
+    .theater-popup-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .theater-popup-body {
+        padding: 10px;
+        text-align: center;
+        max-height: calc(100% - 80px);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .theater-popup-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: contain;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -359,11 +691,34 @@ def render_badge_board():
     # Current number of cleared villages (get from session state or default to 0)
     cleared_villages = st.session_state.get('cleared_villages', [])
     
-    # Determine badge image path
-    if not cleared_villages:
+    # Current page to determine which badge to show
+    current_page = st.session_state.get('current_page', 'intro')
+    
+    # Determine badge image path based on current page and cleared villages
+    if current_page == "village" and 1 in cleared_villages:
+        # 시작의 마을에서 뱃지 획득
+        badge_image_path = "assets/뱃지 보드/1_시작의 마을 뱃지 획득.png"
+    elif current_page == "feedback_age" and 1 in cleared_villages:
+        # 이야기 숲에서 시작의 마을 뱃지 표시
+        badge_image_path = "assets/뱃지 보드/1_시작의 마을 뱃지 획득.png"
+    elif current_page == "prepare_page" and 2 in cleared_villages:
+        # 준비의 광장에서 이야기 숲 뱃지 표시
+        badge_image_path = "assets/뱃지 보드/2_이야기 숲 뱃지 획득.png"
+    elif current_page == "hwanho_page" and 3 in cleared_villages:
+        # 환호의 극장에서 준비의 광장 뱃지 표시
+        badge_image_path = "assets/뱃지 보드/3_준비의 광장 뱃지 획득.png"
+    elif current_page == "memory_page" and 4 in cleared_villages:
+        # 추억의 언덕에서 환호의 극장 뱃지 표시
+        badge_image_path = "assets/뱃지 보드/4_환호의 극장 뱃지 획득.png"
+    elif current_page == "summary_page" and 5 in cleared_villages:
+        # 요약 페이지에서 추억의 언덕 뱃지 표시
+        badge_image_path = "assets/뱃지 보드/5_추억의 언덕 뱃지 획득.png"
+    elif not cleared_villages:
+        # 아직 클리어한 마을이 없음
         badge_image_path = "assets/뱃지 보드/0_빈 뱃지 화면.png"
     else:
-        # Village name mapping
+        # 기본적으로 가장 높은 클리어된 마을의 뱃지 표시
+        max_cleared = max(cleared_villages)
         village_names = {
             1: "시작의 마을 뱃지 획득",
             2: "이야기 숲 뱃지 획득", 
@@ -371,8 +726,8 @@ def render_badge_board():
             4: "환호의 극장 뱃지 획득",
             5: "추억의 언덕 뱃지 획득"
         }
-        if cleared_villages[0] in village_names:
-            badge_image_path = f"assets/뱃지 보드/{cleared_villages[0]}_{village_names[cleared_villages[0]]}.png"
+        if max_cleared in village_names:
+            badge_image_path = f"assets/뱃지 보드/{max_cleared}_{village_names[max_cleared]}.png"
         else:
             badge_image_path = "assets/뱃지 보드/0_빈 뱃지 화면.png"
     
@@ -398,7 +753,7 @@ def render_badge_board():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             submit_button = st.form_submit_button(
-                "🏆 뱃지 보드",
+                "🏆 뱃지 보드 (업데이트)",
                 type="primary" if st.session_state.badge_visible else "secondary",
                 use_container_width=True,
                 help="뱃지 보드를 보이거나 숨깁니다 (더블 클릭)"
@@ -424,13 +779,166 @@ def render_badge_board():
             # Display base64 image using CSS classes
             st.markdown(f"""
             <div class="image-container">
-                <img src="data:image/png;base64,{badge_image}" alt="뱃지">
+                <img src="data:image/image;base64,{badge_image}" alt="뱃지">
             </div>
             """, unsafe_allow_html=True)
-            st.markdown(f"**클리어한 마을: {len(cleared_villages)}개**")
+            st.markdown(f"**모험 완료한 장소: {len(cleared_villages)}개**")
+            
+            # 마을 이름들 하드코딩
+            village_names = ["시작의 마을", "이야기 숲", "준비의 광장", "환호의 극장", "추억의 언덕"]
+            
+            # 클리어된 마을들 표시
+            if cleared_villages:
+                st.markdown("**완료한 마을들:**")
+                for i, village_id in enumerate(sorted(cleared_villages)):
+                    if 1 <= village_id <= len(village_names):
+                        village_name = village_names[village_id - 1]  # village_id는 1부터 시작
+                        st.markdown(f"• {village_name}")
+            else:
+                st.markdown("*아직 완료한 마을이 없습니다.*")
     else:
         # Clear the container when hidden
-        badge_container.empty()
+        badge_container.container().empty()
+
+def render_map_popup():
+    """지도 팝업을 렌더링하는 함수"""
+    # 지도 팝업 표시 상태 확인
+    if st.session_state.get('show_map_popup', False):
+        # 전체지도.png 이미지 로드
+        map_image = get_base64_image(get_file_path("assets/사진 모음/전체 지도.png"))
+        
+        if map_image:
+            # 팝업 오버레이와 지도 이미지 표시
+            st.markdown(f"""
+            <div id="map-popup-overlay" class="map-popup-overlay">
+                <div class="map-popup-content">
+                    <div class="map-popup-header">
+                        <h3>🗺️ 연극 대모험 지도</h3>
+                    </div>
+                    <div class="map-popup-body">
+                        <img src="data:image/png;base64,{map_image}" alt="전체 지도" class="map-popup-image">
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 간단한 닫기 버튼
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("❌ 팝업 닫기", key="close_map_popup", use_container_width=True):
+                st.session_state.show_map_popup = False
+                st.rerun()
+
+def render_help_popup():
+    """사용 방법 팝업을 렌더링하는 함수"""
+    # 사용 방법 팝업 표시 상태 확인
+    if st.session_state.get('show_help_popup', False):
+        # 사용 방법.png 이미지 로드
+        help_image = get_base64_image(get_file_path("assets/사진 모음/사용 방법.png"))
+        
+        if help_image:
+            # 팝업 오버레이와 사용 방법 이미지 표시
+            st.markdown(f"""
+            <div id="help-popup-overlay" class="help-popup-overlay">
+                <div class="help-popup-content">
+                    <div class="help-popup-header">
+                        <h3>📖 사용 방법</h3>
+                    </div>
+                    <div class="help-popup-body">
+                        <img src="data:image/png;base64,{help_image}" alt="사용 방법" class="help-popup-image">
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 간단한 닫기 버튼
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("❌ 팝업 닫기", key="close_help_popup", use_container_width=True):
+                st.session_state.show_help_popup = False
+                st.rerun()
+
+def render_faq_popup():
+    """자주하는 질문 팝업을 렌더링하는 함수"""
+    # 자주하는 질문 팝업 표시 상태 확인
+    if st.session_state.get('show_faq_popup', False):
+        # 자주하는 질문.png 이미지 로드
+        faq_image = get_base64_image(get_file_path("assets/사진 모음/자주하는 질문.png"))
+        
+        if faq_image:
+            # 팝업 오버레이와 자주하는 질문 이미지 표시
+            st.markdown(f"""
+            <div id="faq-popup-overlay" class="faq-popup-overlay">
+                <div class="faq-popup-content">
+                    <div class="faq-popup-header">
+                        <h3>❓ 자주하는 질문</h3>
+                    </div>
+                    <div class="faq-popup-body">
+                        <img src="data:image/png;base64,{faq_image}" alt="자주하는 질문" class="map-popup-image">
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 간단한 닫기 버튼
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("❌ 팝업 닫기", key="close_faq_popup", use_container_width=True):
+                st.session_state.show_faq_popup = False
+                st.rerun()
+
+def render_script_popup():
+    """극본의 특성 팝업을 렌더링하는 함수"""
+    # 극본의 특성 팝업 표시 상태 확인
+    if st.session_state.get('show_script_popup', False):
+        # 극본의 특성.png 이미지 로드
+        script_image = get_base64_image(get_file_path("assets/사진 모음/극본의 특성.png"))
+        
+        if script_image:
+            # 팝업 오버레이와 극본의 특성 이미지 표시
+            st.markdown(f"""
+            <div id="script-popup-overlay" class="script-popup-overlay">
+                <div class="script-popup-content">
+                    <div class="script-popup-header">
+                        <h3>📝 극본의 특성</h3>
+                    </div>
+                    <div class="script-popup-body">
+                        <img src="data:image/png;base64,{script_image}" alt="극본의 특성" class="script-popup-image">
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 간단한 닫기 버튼
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("❌ 팝업 닫기", key="close_script_popup", use_container_width=True):
+                st.session_state.show_script_popup = False
+                st.rerun()
+
+def render_theater_popup():
+    """연극의 특성 팝업을 렌더링하는 함수"""
+    # 연극의 특성 팝업 표시 상태 확인
+    if st.session_state.get('show_theater_popup', False):
+        # 연극의 특성.png 이미지 로드
+        theater_image = get_base64_image(get_file_path("assets/사진 모음/연극의 특성.png"))
+        
+        if theater_image:
+            # 팝업 오버레이와 연극의 특성 이미지 표시
+            st.markdown(f"""
+            <div id="theater-popup-overlay" class="theater-popup-overlay">
+                <div class="theater-popup-content">
+                    <div class="theater-popup-header">
+                        <h3>🎭 연극의 특성</h3>
+                    </div>
+                    <div class="theater-popup-body">
+                        <img src="data:image/png;base64,{theater_image}" alt="연극의 특성" class="theater-popup-image">
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 간단한 닫기 버튼
+            st.markdown("<br>", unsafe_allow_html=True)
+            if st.button("❌ 팝업 닫기", key="close_theater_popup", use_container_width=True):
+                st.session_state.show_theater_popup = False
+                st.rerun()
 
 def clear_village(village_number):
     """Function called when a village is cleared"""
@@ -455,15 +963,20 @@ def play_bgm(bgm_path):
             # Only display audio player if it's not already displayed
             if 'bgm_displayed' not in st.session_state or not st.session_state.bgm_displayed:
                 st.session_state.bgm_displayed = True
-                # Display audio player in top right (minimal size)
-                st.markdown(f"""
-                <div class="audio-player-container">
-                    <div class="audio-label">🎵</div>
-                    <audio controls autoplay loop style="width: 35px; height: 20px;">
-                        <source src="data:audio/mp3;base64,{base64.b64encode(open(bgm_path, 'rb').read()).decode()}" type="audio/mp3">
-                    </audio>
-                </div>
-                """, unsafe_allow_html=True)
+                
+                # 오른쪽 위에 작은 BGM 컨트롤 배치
+                col1, col2, col3 = st.columns([0.9, 0.05, 0.05])
+                
+                with col3:
+                    # BGM 라벨과 오디오 컨트롤을 작게 표시
+                    st.markdown("🎵", help="BGM")
+                    st.audio(
+                        open(bgm_path, 'rb').read(),
+                        format='audio/mp3',
+                        start_time=0,
+                        sample_rate=None,
+                        key="bgm_player"
+                    )
         else:
             st.error(f"BGM 파일을 찾을 수 없습니다: {bgm_path}")
     except Exception as e:
@@ -477,8 +990,25 @@ def main():
     if 'cleared_villages' not in st.session_state:
         st.session_state.cleared_villages = []
     
+
+    
     # Render badge board (displayed on all pages)
     render_badge_board()
+    
+    # Render map popup if needed (displayed on all pages)
+    render_map_popup()
+    
+    # Render help popup if needed (displayed on all pages)
+    render_help_popup()
+    
+    # Render FAQ popup if needed (displayed on all pages)
+    render_faq_popup()
+    
+    # Render script popup if needed (displayed on all pages)
+    render_script_popup()
+    
+    # Render theater popup if needed (displayed on all pages)
+    render_theater_popup()
     
     # Page routing
     if st.session_state.current_page == "intro":
@@ -491,6 +1021,14 @@ def main():
         story_forest_page()
     elif st.session_state.current_page == "feedback_age":
         feedback_age_page()
+    elif st.session_state.current_page == "prepare_page":
+        prepare_page()
+    elif st.session_state.current_page == "hwanho_page":
+        hwanho_page()
+    elif st.session_state.current_page == "memory_page":
+        memory_page()
+    elif st.session_state.current_page == "summary_page":
+        summary_page()
     else:
         st.session_state.current_page = "intro"
         intro_page()

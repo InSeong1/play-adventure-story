@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from utils import play_bgm, get_file_path, get_base64_image, render_common_menu
 
 def adventure_map_page():
@@ -22,16 +23,20 @@ def adventure_map_page():
     # 메인 콘텐츠
     # 제목과 설명 제거 - 지도 이미지만 표시
     
-    # 전체 지도 이미지 표시 - 엄청 크게
+    # 전체 지도 이미지 표시 - 적당한 크기로
     map_image = get_base64_image(get_file_path("사진 모음/전체 지도.png"))
     
     if map_image:
-        # 이미지를 CSS 클래스를 사용하여 표시
+        # 이미지를 CSS 클래스를 사용하여 적당한 크기로 표시
         st.markdown(f"""
         <div class="image-container">
-            <img src="data:image/png;base64,{map_image}" alt="연극 대모험 지도">
+            <img src="data:image/png;base64,{map_image}" alt="연극 대모험 지도" style="max-width: 100%; height: auto;">
         </div>
         """, unsafe_allow_html=True)
+    else:
+        st.error("지도 이미지를 불러올 수 없습니다.")
+        st.write(f"파일 경로: {get_file_path('사진 모음/전체 지도.png')}")
+        st.write(f"파일 존재 여부: {os.path.exists(get_file_path('사진 모음/전체 지도.png'))}")
     
     # 시작의 마을로 출발하기 버튼 - 나중에 추가할 버튼들을 위한 위치 확보
     st.markdown("<br><br><br>", unsafe_allow_html=True)  # 이미지와 버튼 사이 간격
@@ -51,6 +56,6 @@ def adventure_map_page():
         # 예시: 다음 버튼이 추가될 위치
         # if st.button("🌲 이야기 숲으로 출발하기", key="go_to_forest", use_container_width=True):
         #     st.session_state.current_page = "forest"
-        #     st.rerun()
+        #         st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
