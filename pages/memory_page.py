@@ -95,6 +95,31 @@ def memory_page():
     # 메인 콘텐츠
     st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
     
+    # 환호의 극장 뱃지 표시
+    badge_path = get_file_path("뱃지 모음/4_뱃지_환호의 극장.png")
+    badge_image = get_base64_image(badge_path)
+    
+    if badge_image:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
+                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
+                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 환호의 극장 뱃지 획득!</h3>
+                <div style="text-align: center;">
+                    <img src="data:image/png;base64,{badge_image}" 
+                         style="max-width: 150px; height: auto; border-radius: 10px; 
+                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
+                         alt="환호의 극장 뱃지">
+                </div>
+                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
+                    🎉 환호의 극장을 성공적으로 클리어했습니다!
+                </p>
+            </div>
+            """.format(badge_image=badge_image), unsafe_allow_html=True)
+    else:
+        st.error("환호의 극장 뱃지 이미지를 불러올 수 없습니다.")
+    
     # 추억의 언덕 제목
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">

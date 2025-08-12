@@ -55,7 +55,7 @@ def play_bgm(audio_file, autoplay=True, loop=True):
             # BGM 오디오 플레이어 표시 (최소 사이즈)
             st.markdown("""
             <div class="audio-player-container">
-                <div class="audio-label">🎵</div>
+                <div class="audio-label">🎵 배경 음악</div>
             </div>
             """, unsafe_allow_html=True)
             
@@ -120,6 +120,14 @@ def render_common_menu():
             st.session_state.show_faq_popup = False
         st.session_state.show_faq_popup = not st.session_state.show_faq_popup
         st.rerun()
+    
+    # 메뉴 하단에 안내 문구 추가
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(
+        "<p style='text-align: center; color: #666; font-size: 0.9rem; margin: 10px 0;'>"
+        "💡 버튼을 클릭해 정보 보기/닫기</p>", 
+        unsafe_allow_html=True
+    )
 
 def clear_village(village_number):
     """마을을 클리어했을 때 호출하는 함수"""

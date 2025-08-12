@@ -753,7 +753,7 @@ def render_badge_board():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             submit_button = st.form_submit_button(
-                "🏆 뱃지 보드 (업데이트)",
+                "🏆 뱃지 보드 (진행 현황 보기)",
                 type="primary" if st.session_state.badge_visible else "secondary",
                 use_container_width=True,
                 help="뱃지 보드를 보이거나 숨깁니다 (더블 클릭)"

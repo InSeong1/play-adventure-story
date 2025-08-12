@@ -58,7 +58,7 @@ def story_forest_page():
             "수정된 대본을 입력하세요",
             value=st.session_state.generated_scenario,
             height=300,
-            help="대본을 수정하여 더 좋은 연극을 만들어보세요"
+            help="대본을 수정하여 더 좋은 연극을 만들어 보세요."
         )
         
         # 피드백 입력
@@ -66,10 +66,10 @@ def story_forest_page():
         st.markdown("#### 💬 피드백")
         
         feedback = st.text_area(
-            "대본에 대한 피드백을 입력하세요",
+            "대본에 대한 피드백을 입력하세요.",
             placeholder="대본의 장점, 개선점, 아이디어 등을 자유롭게 작성해주세요...",
             height=150,
-            help="대본을 더 좋게 만들기 위한 의견을 남겨주세요"
+            help="대본을 더 좋게 만들기 위한 의견을 남겨주세요."
         )
         
         # 수정 완료 버튼

@@ -83,6 +83,34 @@ def feedback_age_page():
                 st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
                 st.write(f"파일 경로: 나레이션 소리 모음/2.이야기 숲.mp3")
     
+    # 시작의 마을 뱃지 표시
+    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
+    
+    # 시작의 마을 뱃지 표시
+    badge_path = get_file_path("뱃지 모음/1_뱃지_시작의 마을.png")
+    badge_image = get_base64_image(badge_path)
+    
+    if badge_image:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
+                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
+                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 시작의 마을 뱃지 획득!</h3>
+                <div style="text-align: center;">
+                    <img src="data:image/png;base64,{badge_image}" 
+                         style="max-width: 150px; height: auto; border-radius: 10px; 
+                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
+                         alt="시작의 마을 뱃지">
+                </div>
+                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
+                    🎉 시작의 마을을 성공적으로 클리어했습니다!
+                </p>
+            </div>
+            """.format(badge_image=badge_image), unsafe_allow_html=True)
+    else:
+        st.error("뱃지 이미지를 불러올 수 없습니다.")
+    
     # 사용자 입력 폼 (스크롤 아래에 배치)
     st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
     
@@ -90,7 +118,7 @@ def feedback_age_page():
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
         <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">✏️ 극본 작성하기</h2>
-        <p style="color: #666; font-size: 1.1rem;">이전 마을에서 입력한 정보를 확인하고 대본을 작성해보아요. <br>왼쪽 메뉴에서 극본의 구성 요소를 확인해 보아요.</p>
+        <p style="color: #666; font-size: 1.1rem;">이전 마을에서 입력한 정보를 확인하고 대본을 작성해 보아요. <br>왼쪽 메뉴에서 극본의 구성 요소를 확인해 보아요.</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -209,7 +237,7 @@ def feedback_age_page():
                 f"무대 설정 (장면 {scene_num})",
                 value=st.session_state.scene_inputs.get(stage_key, ""),
                 placeholder=stage_placeholder,
-                help=f"시간, 공간적 배경에 맞는 해당 장면의 무대를 입력해주세요.",
+                help=f"시간, 공간적 배경에 맞는 해당 장면의 무대를 입력해 주세요.",
                 key=f"stage_input_{scene_num}"
             )
             
@@ -218,9 +246,9 @@ def feedback_age_page():
             script_input = st.text_area(
                 f"대본 내용 (장면 {scene_num})",
                 value=st.session_state.scene_inputs.get(script_key, ""),
-                placeholder=f"장면 {scene_num}의 대본을 입력해주세요...",
+                placeholder=f"장면 {scene_num}의 대본을 입력해 주세요...",
                 height=150,
-                help=f"장면 {scene_num}의 대사와 행동을 포함한 대본을 작성해주세요.",
+                help=f"장면 {scene_num}의 대사와 행동을 포함한 대본을 작성해 주세요.",
                 key=f"script_input_{scene_num}"
             )
             
@@ -317,7 +345,7 @@ def feedback_age_page():
                         st.error(f"프롬프트 파일을 불러올 수 없습니다: {str(e)}")
             else:
                 # 경고 메시지 표시
-                st.warning("⚠️ 모든 장면의 무대와 대본을 입력해주세요!")
+                st.warning("⚠️ 모든 장면의 무대와 대본을 입력해 주세요!")
                 st.info(f"아직 입력되지 않은 항목: {', '.join(missing_inputs)}")
                 
                 # 비활성화된 AI 피드백 버튼
@@ -330,7 +358,10 @@ def feedback_age_page():
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### 💬 AI 피드백")
             st.markdown("---")
-            st.markdown(st.session_state.generated_feedback)
+            
+            # AI 응답의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
+            formatted_feedback = st.session_state.generated_feedback.replace('\n', '\n\n')
+            st.markdown(formatted_feedback)
             
             # 피드백을 바탕으로 대본 수정 안내
             st.markdown("<br>", unsafe_allow_html=True)
@@ -339,7 +370,7 @@ def feedback_age_page():
             <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 10px; margin: 1rem 0;">
                 <h4 style="color: #2E86AB; margin-bottom: 0.5rem;">📝 대본 수정 안내</h4>
                 <p style="color: #666; margin: 0;">
-                    위의 AI 피드백을 바탕으로 <strong>장면별 대본 작성</strong> 섹션에서 대본을 수정해보세요.<br>
+                    위의 AI 피드백을 바탕으로 <strong>장면별 대본 작성</strong> 섹션에서 대본을 수정해 보세요.<br>
                     수정 후 다시 AI 피드백을 받을 수 있습니다.
                 </p>
             </div>
@@ -360,7 +391,7 @@ def feedback_age_page():
     
     else:
         st.warning("⚠️ 이전 마을에서 입력한 정보를 찾을 수 없습니다.")
-        st.info("시작의 마을에서 연극 정보를 먼저 입력해주세요.")
+        st.info("시작의 마을에서 연극 정보를 먼저 입력해 주세요.")
         
         # 홈으로 돌아가기 버튼
         col1, col2, col3 = st.columns([1, 2, 1])

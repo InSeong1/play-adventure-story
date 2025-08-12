@@ -76,7 +76,7 @@ def village_page():
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
         <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">🎭 연극 대본 계획서 작성하기</h2>
-        <p style="color: #666; font-size: 1.1rem;">연극 대본 작성을 위한 기본 정보를 입력해주세요.</p>
+        <p style="color: #666; font-size: 1.1rem;">연극 대본 작성을 위한 기본 정보를 입력해 주세요.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -119,14 +119,14 @@ def village_page():
         # 시간적 배경
         time_background = st.text_input(
             "⏰ 시간적 배경",
-            placeholder="예: 2024년, 조선시대, 미래...",
+            placeholder="예: 2025 년, 조선시대, 미래...",
             help="연극이 일어나는 시대나 시간을 입력하세요. 배경이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
         # 공간적 배경
         space_background = st.text_input(
             "🏛️ 공간적 배경",
-            placeholder="예: 서울, 울산대공원, 구름 위, 우주선...",
+            placeholder="예: 교실, 강당, 시청각실실...",
             help="연극이 일어나는 장소나 공간을 입력하세요. 시간이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
@@ -153,7 +153,7 @@ def village_page():
         story_flow = st.text_area(
             "📖 이야기 흐름",
             placeholder="예: 가난하지만 마음씨 착한 주인공이 길에서 잃어버린 지갑을 주워 주인에게 돌려준다. 지갑 주인이 선행에 감동해 주인공이 위기에 처했을 때 도와준다.",
-            help="연극의 주요 이야기 흐름을 자세히 설명해주세요.",
+            help="연극의 주요 이야기 흐름을 자세히 설명해 주세요.",
             height=100
         )
     
@@ -168,17 +168,17 @@ def village_page():
                 
                 # 1. 필수 입력 확인
                 if character_names.strip() == "":
-                    validation_errors.append("등장인물 이름을 입력해주세요.")
+                    validation_errors.append("등장인물 이름을 입력해 주세요.")
                 if genre.strip() == "":
-                    validation_errors.append("연극 장르를 입력해주세요.")
+                    validation_errors.append("연극 장르를 입력해 주세요.")
                 if time_background.strip() == "":
-                    validation_errors.append("시간적 배경을 입력해주세요.")
+                    validation_errors.append("시간적 배경을 입력해 주세요.")
                 if space_background.strip() == "":
-                    validation_errors.append("공간적 배경을 입력해주세요.")
+                    validation_errors.append("공간적 배경을 입력해 주세요.")
                 if theme.strip() == "":
-                    validation_errors.append("연극 주제를 입력해주세요.")
+                    validation_errors.append("연극 주제를 입력해 주세요.")
                 if story_flow.strip() == "":
-                    validation_errors.append("이야기 흐름을 입력해주세요.")
+                    validation_errors.append("이야기 흐름을 입력해 주세요.")
                 
                 # 2. 등장인물 수와 이름 개수 확인
                 if character_names.strip() != "":
@@ -193,7 +193,7 @@ def village_page():
                 
                 # 검증 오류가 있으면 탭으로 구분해서 표시
                 if validation_errors:
-                    st.error("⚠️ 입력 정보를 확인해주세요:")
+                    st.error("⚠️ 입력 정보를 확인해 주세요:")
                     
                     # 오류 유형별로 탭 생성
                     tab_names = []
@@ -241,16 +241,16 @@ def village_page():
                         <p style="color: #856404; font-weight: bold; margin: 0;">⚠️ 주의사항:</p>
                         <ul style="color: #856404; margin: 0.5rem 0 0 0;">
                             <li>잔인하거나 폭력적인 내용은 포함하지 마세요.</li>
-                            <li>모든 필수 항목을 정확히 입력해주세요.</li>
-                            <li>등장인물 수와 이름 개수를 일치시켜주세요.</li>
-                            <li>공연시간에 비해 장면 수가 너무 많지 않도록 설정해주세요.</li>
+                            <li>모든 필수 항목을 정확히 입력해 주세요.</li>
+                            <li>등장인물 수와 이름 개수를 일치시켜 주세요.</li>
+                            <li>공연시간에 비해 장면 수가 너무 많지 않도록 설정해 주세요.</li>
                         </ul>
                     </div>
                     """, unsafe_allow_html=True)
                 
                 # 검증 통과 시 다음 마을로 진행
                 else:
-                    st.success("🎉 연극에 필요한 기본 정보들을 입력 받았어요!\n다음 마을로 모험을 계속해볼까요?")
+                    st.success("🎉 연극에 필요한 기본 정보들을 입력 받았어요!\n다음 마을로 모험을 계속해 볼까요?")
                     
                     # 입력된 값들을 세션에 저장
                     st.session_state.village_inputs = {

@@ -39,7 +39,7 @@ def summary_page():
     <div style="text-align: center; padding: 2rem;">
         <h1 style="color: #2E86AB; font-weight: bold; margin-bottom: 2rem;">🏆 연극 대모험 완주 축하합니다!</h1>
         <p style="color: #666; font-size: 1.2rem; margin-bottom: 3rem;">
-            당신의 연극 여정을 돌아보는 시간입니다
+            연극 대모험 여정을 돌아보는 시간입니다.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -142,7 +142,7 @@ def summary_page():
                     if stage.strip():
                         st.markdown(f"**무대:** {stage}")
                     if script.strip():
-                        st.markdown(f"**대본:** {script}")
+                        st.markdown(f"**대본:** {script.replace(chr(10), chr(10) + chr(10))}")
                     st.markdown("---")
         else:
             st.info("장면 수 정보를 찾을 수 없습니다.")
@@ -154,7 +154,7 @@ def summary_page():
         st.markdown("**🤖 AI 피드백:**")
         st.markdown(f"""
         <div style="background: #f8f9fa; padding: 1rem; border-radius: 10px; border-left: 4px solid #007bff; color: #333;">
-            {st.session_state.generated_feedback}
+            {st.session_state.generated_feedback.replace(chr(10), chr(10) + chr(10))}
         </div>
         """, unsafe_allow_html=True)
     
@@ -217,7 +217,7 @@ def summary_page():
             else:
                 st.markdown(f"⭕ {item}")
         
-        st.markdown("<br>**👥 관람자 체크리스트:**")
+        st.markdown("**👥 관람자 체크리스트:**")
         audience_items = [
             "공연을 끝까지 집중해서 보았다",
             "공연 중에 박수·웃음·호응을 예의 바르게 했다",
@@ -244,12 +244,12 @@ def summary_page():
     st.markdown("### 🌅 추억의 언덕 - 나만의 특별한 상")
     
     if 'generated_award' in st.session_state:
-        st.markdown("**🏆 AI가 생성한 상:**")
+        st.markdown("**🏆 AI가 주는 특별한 상:**")
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                     padding: 2rem; border-radius: 15px; color: white; margin: 1rem 0;">
             <div style="white-space: pre-line; font-size: 1.1rem; line-height: 1.6;">
-                {st.session_state.generated_award}
+                {st.session_state.generated_award.replace('**', '').replace('*', '').replace(chr(10), chr(10) + chr(10))}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -273,7 +273,7 @@ def summary_page():
             answer = st.session_state.memory_answers.get(f"answer_{i}", "")
             if answer.strip():
                 st.markdown(f"**질문 {i+1}:** {question}")
-                st.markdown(f"**답변:** {answer}")
+                st.markdown(f"**답변:** {answer.replace(chr(10), chr(10) + chr(10))}")
                 st.markdown("<br>", unsafe_allow_html=True)
     else:
         st.info("추억의 언덕에서 작성한 답변이 없습니다.")

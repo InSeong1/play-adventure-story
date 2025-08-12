@@ -94,6 +94,31 @@ def prepare_page():
     # 메인 콘텐츠
     st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
     
+    # 이야기 숲 뱃지 표시
+    badge_path = get_file_path("뱃지 모음/2_뱃지_이야기숲.png")
+    badge_image = get_base64_image(badge_path)
+    
+    if badge_image:
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("""
+            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
+                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
+                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 이야기 숲 뱃지 획득!</h3>
+                <div style="text-align: center;">
+                    <img src="data:image/png;base64,{badge_image}" 
+                         style="max-width: 150px; height: auto; border-radius: 10px; 
+                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
+                         alt="이야기 숲 뱃지">
+                </div>
+                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
+                    🎉 이야기 숲을 성공적으로 클리어했습니다!
+                </p>
+            </div>
+            """.format(badge_image=badge_image), unsafe_allow_html=True)
+    else:
+        st.error("뱃지 이미지를 불러올 수 없습니다.")
+    
     # 준비의 광장 제목
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
@@ -126,6 +151,105 @@ def prepare_page():
         출처: 구민정·권재원(2012), 『학교에서 연극하자』, 다른.
     </div>
     """, unsafe_allow_html=True)
+    
+    # 최종 극본 표시 및 다운로드 섹션
+    if 'scene_inputs' in st.session_state and st.session_state.scene_inputs:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("### 📖 최종 극본")
+        st.markdown("---")
+        
+        # 극본 내용 구성 - village_inputs에서 기본 정보 가져오기
+        final_script = ""
+        
+        # village_inputs에서 기본 정보 가져오기
+        if 'village_inputs' in st.session_state:
+            village_data = st.session_state.village_inputs
+            final_script += f"**등장인물 수:** {village_data.get('character_count', '')}명\n\n"
+            final_script += f"**등장인물:** {village_data.get('character_names', '')}\n\n"
+            final_script += f"**장르:** {village_data.get('genre', '')}\n\n"
+            final_script += f"**시간 배경:** {village_data.get('time_background', '')}\n\n"
+            final_script += f"**공간 배경:** {village_data.get('space_background', '')}\n\n"
+            final_script += f"**공연 시간:** {village_data.get('performance_time', '')}분\n\n"
+            final_script += f"**장면 수:** {village_data.get('scene_count', '')}개\n\n"
+            final_script += f"**주제:** {village_data.get('theme', '')}\n\n"
+            final_script += f"**이야기 흐름:** {village_data.get('story_flow', '')}\n\n"
+        
+        # 장면별 대본 추가 (feedback_age에서 입력한 내용)
+        # village_inputs에서 scene_count를 가져와서 사용
+        scene_count = 0
+        if 'village_inputs' in st.session_state and 'scene_count' in st.session_state.village_inputs:
+            scene_count = st.session_state.village_inputs['scene_count']
+        
+        for scene_num in range(1, scene_count + 1):
+            stage_key = f"stage_{scene_num}"
+            script_key = f"script_{scene_num}"
+            stage = st.session_state.scene_inputs.get(stage_key, "")
+            script = st.session_state.scene_inputs.get(script_key, "")
+            
+            if stage or script:
+                final_script += f"## 장면 {scene_num}\n\n"
+                if stage:
+                    final_script += f"**무대:** {stage}\n\n"
+                if script:
+                    # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
+                    formatted_script = script.replace('\n', '\n\n')
+                    final_script += f"**대본:**\n{formatted_script}\n\n"
+        
+        # AI 피드백이 있다면 추가
+        if 'generated_feedback' in st.session_state:
+            # AI 피드백의 줄바꿈 한 개를 줄바꿈 두 개로 변환
+            formatted_feedback = st.session_state.generated_feedback.replace('\n', '\n\n')
+            final_script += f"## AI 피드백\n\n{formatted_feedback}\n\n"
+        
+        # 극본 내용 표시
+        st.markdown(final_script)
+        
+        # 장면별 대본 미리보기 (선택사항)
+        if scene_count > 0:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### 📖 장면별 대본 미리보기")
+            st.markdown("---")
+            
+            for scene_num in range(1, scene_count + 1):
+                stage_key = f"stage_{scene_num}"
+                script_key = f"script_{scene_num}"
+                stage = st.session_state.scene_inputs.get(stage_key, "")
+                script = st.session_state.scene_inputs.get(script_key, "")
+                
+                if stage or script:
+                    with st.expander(f"🎬 장면 {scene_num}", expanded=False):
+                        if stage:
+                            st.markdown(f"**무대:** {stage}")
+                        if script:
+                            # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환
+                            formatted_script = script.replace('\n', '\n\n')
+                            st.markdown(f"**대본:**\n{formatted_script}")
+        
+        # 다운로드 버튼들
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2 = st.columns([1, 1])
+        
+        with col1:
+            # TXT 파일 다운로드 (극본만, AI 피드백 제외)
+            txt_content = final_script
+            st.download_button(
+                label="📄 TXT 다운로드",
+                data=txt_content,
+                file_name="최종극본.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+        
+        with col2:
+            # 극본 복사하기
+            st.button(
+                label="📋 극본 복사",
+                help="극본 내용을 클립보드에 복사합니다",
+                use_container_width=True,
+                on_click=lambda: st.write("극본이 클립보드에 복사되었습니다!")
+            )
+        
+        st.markdown("---")
     
     # 체크리스트 섹션
     st.markdown("<br><br>", unsafe_allow_html=True)
