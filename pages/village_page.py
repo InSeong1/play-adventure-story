@@ -86,7 +86,7 @@ def village_page():
     with col1:
         # 등장인물의 수
         character_count = st.number_input(
-            "👥 등장인물의 수",
+            "👥 등장인물의 수\n(해설 역할은 제외하고 적어 주세요. 예. 해설, 흥부, 놀부 -> 2)",
             min_value=1,
             max_value=20,
             value=1,
@@ -126,7 +126,7 @@ def village_page():
         # 공간적 배경
         space_background = st.text_input(
             "🏛️ 공간적 배경",
-            placeholder="예: 교실, 강당, 시청각실실...",
+            placeholder="예: 교실, 강당, 시청각실, 울산 대공원...",
             help="연극이 일어나는 장소나 공간을 입력하세요. 시간이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         

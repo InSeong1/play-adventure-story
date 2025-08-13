@@ -123,7 +123,7 @@ def prepare_page():
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
         <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">🎭 준비의 광장에 오신 것을 환영합니다!</h2>
-        <p style="color: #666; font-size: 1.1rem;">이야기 숲에서 작성한 극본을 바탕으로 연극을 준비해보아요.</p>
+        <p style="color: #666; font-size: 1.1rem;">이야기 숲에서 작성한 대본을 바탕으로 연극을 준비해보아요.</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -155,7 +155,7 @@ def prepare_page():
     # 최종 극본 표시 및 다운로드 섹션
     if 'scene_inputs' in st.session_state and st.session_state.scene_inputs:
         st.markdown("<br><br>", unsafe_allow_html=True)
-        st.markdown("### 📖 최종 극본")
+        st.markdown("### 📖 최종 대본")
         st.markdown("---")
         
         # 극본 내용 구성 - village_inputs에서 기본 정보 가져오기
@@ -189,7 +189,7 @@ def prepare_page():
             if stage or script:
                 final_script += f"## 장면 {scene_num}\n\n"
                 if stage:
-                    final_script += f"**무대:** {stage}\n\n"
+                    final_script += f"**배경경:** {stage}\n\n"
                 if script:
                     # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
                     formatted_script = script.replace('\n', '\n\n')
@@ -208,6 +208,7 @@ def prepare_page():
         if scene_count > 0:
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("### 📖 장면별 대본 미리보기")
+            st.markdown("완성된 대본을 다운로드 받거나 복사하여 인쇄하거나 공유할 때 활용하세요.")
             st.markdown("---")
             
             for scene_num in range(1, scene_count + 1):
@@ -219,35 +220,24 @@ def prepare_page():
                 if stage or script:
                     with st.expander(f"🎬 장면 {scene_num}", expanded=False):
                         if stage:
-                            st.markdown(f"**무대:** {stage}")
+                            st.markdown(f"**배경:** {stage}")
                         if script:
                             # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환
                             formatted_script = script.replace('\n', '\n\n')
                             st.markdown(f"**대본:**\n{formatted_script}")
         
-        # 다운로드 버튼들
+        # 다운로드 버튼
         st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2 = st.columns([1, 1])
         
-        with col1:
-            # TXT 파일 다운로드 (극본만, AI 피드백 제외)
-            txt_content = final_script
-            st.download_button(
-                label="📄 TXT 다운로드",
-                data=txt_content,
-                file_name="최종극본.txt",
-                mime="text/plain",
-                use_container_width=True
-            )
-        
-        with col2:
-            # 극본 복사하기
-            st.button(
-                label="📋 극본 복사",
-                help="극본 내용을 클립보드에 복사합니다",
-                use_container_width=True,
-                on_click=lambda: st.write("극본이 클립보드에 복사되었습니다!")
-            )
+        # TXT 파일 다운로드 (극본만, AI 피드백 제외)
+        txt_content = final_script
+        st.download_button(
+            label="📄 TXT 다운로드",
+            data=txt_content,
+            file_name="최종대본.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
         
         st.markdown("---")
     

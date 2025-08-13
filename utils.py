@@ -92,19 +92,19 @@ def render_common_menu():
             st.session_state.show_map_popup = False
         st.session_state.show_map_popup = not st.session_state.show_map_popup
         st.rerun()
+        
+    if st.sidebar.button("🎭 연극의 특성", use_container_width=True):
+        # 연극의 특성 팝업 표시 상태를 토글
+        if 'show_theater_popup' not in st.session_state:
+            st.session_state.show_theater_popup = False
+        st.session_state.show_theater_popup = not st.session_state.show_theater_popup
+        st.rerun()
     
     if st.sidebar.button("📝 극본의 특성", use_container_width=True):
         # 극본의 특성 팝업 표시 상태를 토글
         if 'show_script_popup' not in st.session_state:
             st.session_state.show_script_popup = False
         st.session_state.show_script_popup = not st.session_state.show_script_popup
-        st.rerun()
-    
-    if st.sidebar.button("🎭 연극의 특성", use_container_width=True):
-        # 연극의 특성 팝업 표시 상태를 토글
-        if 'show_theater_popup' not in st.session_state:
-            st.session_state.show_theater_popup = False
-        st.session_state.show_theater_popup = not st.session_state.show_theater_popup
         st.rerun()
     
     if st.sidebar.button("📖 사용 방법", use_container_width=True):
