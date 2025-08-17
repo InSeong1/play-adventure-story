@@ -11,6 +11,8 @@ def intro_page():
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
+    st.header("연극 대모험")
+    st.subheader("초등 5‧6학년의 연극 활동을 위한 통합 학습 AI 소프트웨어")
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
     # 인트로 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
