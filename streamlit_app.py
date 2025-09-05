@@ -1,11 +1,11 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import os
 import base64
 from pages.intro_page import intro_page
 from pages.adventure_map_page import adventure_map_page
 from pages.village_page import village_page
-from pages.story_forest_page import story_forest_page
-from pages.feedback_age import feedback_age_page
+from pages.feedback_page import feedback_page
 from pages.prepare_page import prepare_page
 from pages.hwanho_page import hwanho_page
 from pages.memory_page import memory_page
@@ -87,18 +87,71 @@ window.addEventListener('load', function() {
         }
     }
     
+    // 사용 방법 팝업 닫기 함수
+    function closeHelpPopup() {
+        const popup = document.getElementById('help-popup-overlay');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+    
+    // 자주하는 질문 팝업 닫기 함수
+    function closeFaqPopup() {
+        const popup = document.getElementById('faq-popup-overlay');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+    
+    // 극본의 특성 팝업 닫기 함수
+    function closeScriptPopup() {
+        const popup = document.getElementById('script-popup-overlay');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+    
+    // 연극의 특성 팝업 닫기 함수
+    function closeTheaterPopup() {
+        const popup = document.getElementById('theater-popup-overlay');
+        if (popup) {
+            popup.style.display = 'none';
+        }
+    }
+    
     // ESC 키로 팝업 닫기
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeMapPopup();
+            closeHelpPopup();
+            closeFaqPopup();
+            closeScriptPopup();
+            closeTheaterPopup();
         }
     });
     
     // 팝업 외부 클릭으로 닫기
     document.addEventListener('click', function(event) {
-        const popup = document.getElementById('map-popup-overlay');
-        if (popup && event.target === popup) {
+        const mapPopup = document.getElementById('map-popup-overlay');
+        const helpPopup = document.getElementById('help-popup-overlay');
+        const faqPopup = document.getElementById('faq-popup-overlay');
+        const scriptPopup = document.getElementById('script-popup-overlay');
+        const theaterPopup = document.getElementById('theater-popup-overlay');
+        
+        if (mapPopup && event.target === mapPopup) {
             closeMapPopup();
+        }
+        if (helpPopup && event.target === helpPopup) {
+            closeHelpPopup();
+        }
+        if (faqPopup && event.target === faqPopup) {
+            closeFaqPopup();
+        }
+        if (scriptPopup && event.target === scriptPopup) {
+            closeScriptPopup();
+        }
+        if (theaterPopup && event.target === theaterPopup) {
+            closeTheaterPopup();
         }
     });
 });
@@ -260,70 +313,7 @@ st.markdown("""
         height: 40px !important;
     }
     
-    /* 오른쪽 뱃지 보드 사이드바 스타일 */
-    .badge-sidebar {
-        position: fixed !important;
-        top: 0 !important;
-        right: -400px !important;
-        width: 400px !important;
-        height: 100vh !important;
-        background: rgba(0, 0, 0, 0.9) !important;
-        backdrop-filter: blur(10px) !important;
-        transition: right 0.3s ease !important;
-        z-index: 9999 !important;
-        border-left: 2px solid #FFD700 !important;
-        overflow-y: auto !important;
-        font-family: Arial, sans-serif !important;
-    }
     
-    .badge-sidebar.open {
-        right: 0 !important;
-    }
-    
-    .badge-sidebar-header {
-        background: linear-gradient(45deg, #FFD700, #FFA500);
-        color: #000;
-        padding: 15px;
-        text-align: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        border-bottom: 2px solid #FFD700;
-    }
-    
-    .badge-sidebar-content {
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .badge-image {
-        max-width: 100%;
-        height: auto;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-    }
-    
-    .badge-toggle-btn {
-        position: fixed !important;
-        top: 50% !important;
-        right: 10px !important;
-        transform: translateY(-50%) !important;
-        background: linear-gradient(45deg, #FFD700, #FFA500) !important;
-        color: #000 !important;
-        border: none !important;
-        border-radius: 50% !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1.5rem !important;
-        cursor: pointer !important;
-        z-index: 10000 !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .badge-toggle-btn:hover {
-        transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-    }
     
     .page-wrapper {
         position: relative;
@@ -395,6 +385,30 @@ st.markdown("""
         text-align: center;
         border-bottom: 2px solid #44A08D;
         position: relative;
+    }
+    
+    .popup-close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: bold;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .popup-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
     }
     
     .map-popup-header h3 {
@@ -698,7 +712,7 @@ def render_badge_board():
     if current_page == "village" and 1 in cleared_villages:
         # 시작의 마을에서 뱃지 획득
         badge_image_path = "assets/뱃지 보드/1_시작의 마을 뱃지 획득.png"
-    elif current_page == "feedback_age" and 1 in cleared_villages:
+    elif current_page == "feedback_page" and 1 in cleared_villages:
         # 이야기 숲에서 시작의 마을 뱃지 표시
         badge_image_path = "assets/뱃지 보드/1_시작의 마을 뱃지 획득.png"
     elif current_page == "prepare_page" and 2 in cleared_villages:
@@ -800,158 +814,208 @@ def render_badge_board():
         # Clear the container when hidden
         badge_container.container().empty()
 
+@st.dialog("🗺️ 연극 대모험 지도", width="large")
+def show_map_dialog():
+    """지도 다이얼로그"""
+    # 전체지도.png 이미지 로드
+    map_image = get_base64_image(get_file_path("assets/사진 모음/전체 지도.png"))
+    
+    if map_image:
+        # 지도 이미지 표시
+        st.image(f"data:image/png;base64,{map_image}")
+    else:
+        st.error("지도 이미지를 불러올 수 없습니다.")
+
+@st.dialog("알림", width="medium")
+def show_arrival_dialog(message: str = ""):
+    if message:
+        st.markdown(message)
+
+@st.dialog("🏆 뱃지 획득", width="large")
+def show_badge_dialog(image_filename: str = ""):
+    if not image_filename:
+        return
+    full_path = get_file_path(f"assets/뱃지 모음/{image_filename}")
+    badge_image = get_base64_image(full_path)
+    captions = {
+        "1_뱃지_시작의 마을.png": "시작의 마을 뱃지를 획득했어요! 다음 모험도 힘차게 떠나볼까요?",
+        "2_뱃지_이야기숲.png": "이야기 숲 뱃지를 획득했어요! 멋진 아이디어가 숲처럼 자라고 있어요!",
+        "3_뱃지_준비의 광장.png": "준비의 광장 뱃지를 획득했어요! 차근차근 준비한 만큼 더 멋진 공연이 될 거예요!",
+        "4_뱃지_환호의 극장.png": "환호의 극장 뱃지를 획득했어요! 최고의 무대였어요, 정말 자랑스러워요!",
+        "5_뱃지_추억의 언덕.png": "마지막 뱃지까지 모두 모았어요! 오늘의 모험을 멋지게 마무리했네요. 정말 잘했어요!"
+    }
+    if badge_image:
+        st.markdown(f"<div style='text-align:center'><img src='data:image/png;base64,{badge_image}' alt='뱃지' style='max-width: 90%; height: auto; border-radius: 14px; box-shadow: 0 12px 36px rgba(0,0,0,0.25);'></div>", unsafe_allow_html=True)
+        caption = captions.get(image_filename, "멋진 성과예요! 계속해서 즐겁게 모험을 이어가요!")
+        st.markdown(f"<div style='text-align:center; margin-top: 12px; font-size: 1.05rem;'>✨ {caption}</div>", unsafe_allow_html=True)
+    else:
+        st.error("뱃지 이미지를 불러올 수 없습니다.")
+
+def scroll_to_top():
+    """페이지 상단으로 스크롤하는 함수"""
+    import streamlit.components.v1 as components
+    
+    # 현재 페이지에 따라 적절한 div ID 선택
+    current_page = st.session_state.get('current_page', 'intro')
+    page_div_ids = {
+        'village': 'village-page-top',
+        'story_forest': 'feedback-page-top',  # feedback_page의 div ID
+        'feedback_page': 'feedback-page-top',
+        'prepare_page': 'prepare-page-top',
+        'hwanho_page': 'hwanho-page-top',
+        'memory_page': 'memory-page-top',
+        'summary_page': 'summary-page-top'
+    }
+    
+    target_div_id = page_div_ids.get(current_page, None)
+    
+    if target_div_id:
+        components.html(f"""
+        <script>
+            // 특정 div로 스크롤
+            setTimeout(function() {{
+                var element = window.parent.document.getElementById('{target_div_id}');
+                if (element) {{
+                    element.scrollIntoView({{behavior: 'smooth', block: 'start'}});
+                }} else {{
+                    // fallback: 페이지 상단으로 스크롤
+                    window.parent.scrollTo(0, 0);
+                }}
+            }}, 100);
+        </script>
+        """, height=0)
+    else:
+        # 기본 스크롤 (intro 페이지 등)
+        components.html("""
+        <script>
+            // 여러 방법으로 스크롤을 맨 위로 이동
+            window.parent.scrollTo(0, 0);
+            window.parent.scrollTo(0, -1000);
+            
+            // DOM이 로드된 후에도 실행
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 100);
+        </script>
+        """, height=0)
+
+def scroll_to_element(element_id):
+    """특정 요소로 스크롤하는 함수"""
+    import streamlit.components.v1 as components
+    components.html(f"""
+    <script>
+        var element = window.parent.document.getElementById('{element_id}');
+        if (element) {{
+            element.scrollIntoView({{behavior: 'smooth', block: 'start'}});
+        }}
+    </script>
+    """, height=0)
+
 def render_map_popup():
     """지도 팝업을 렌더링하는 함수"""
     # 지도 팝업 표시 상태 확인
     if st.session_state.get('show_map_popup', False):
-        # 전체지도.png 이미지 로드
-        map_image = get_base64_image(get_file_path("assets/사진 모음/전체 지도.png"))
-        
-        if map_image:
-            # 팝업 오버레이와 지도 이미지 표시
-            st.markdown(f"""
-            <div id="map-popup-overlay" class="map-popup-overlay">
-                <div class="map-popup-content">
-                    <div class="map-popup-header">
-                        <h3>🗺️ 연극 대모험 지도</h3>
-                    </div>
-                    <div class="map-popup-body">
-                        <img src="data:image/png;base64,{map_image}" alt="전체 지도" class="map-popup-image">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        show_map_dialog()
+        # 다이얼로그가 닫히면 상태 초기화
+        st.session_state.show_map_popup = False
+        # 팝업 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
             
-            # 간단한 닫기 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ 팝업 닫기", key="close_map_popup", use_container_width=True):
-                st.session_state.show_map_popup = False
-                st.rerun()
+
+@st.dialog("📖 사용 방법", width="large")
+def show_help_dialog():
+    """사용 방법 다이얼로그"""
+    # 사용 방법.png 이미지 로드
+    help_image = get_base64_image(get_file_path("assets/사진 모음/사용 방법.png"))
+    
+    if help_image:
+        # 사용 방법 이미지 표시
+        st.image(f"data:image/png;base64,{help_image}")
+    else:
+        st.error("사용 방법 이미지를 불러올 수 없습니다.")
 
 def render_help_popup():
     """사용 방법 팝업을 렌더링하는 함수"""
     # 사용 방법 팝업 표시 상태 확인
     if st.session_state.get('show_help_popup', False):
-        # 사용 방법.png 이미지 로드
-        help_image = get_base64_image(get_file_path("assets/사진 모음/사용 방법.png"))
-        
-        if help_image:
-            # 팝업 오버레이와 사용 방법 이미지 표시
-            st.markdown(f"""
-            <div id="help-popup-overlay" class="help-popup-overlay">
-                <div class="help-popup-content">
-                    <div class="help-popup-header">
-                        <h3>📖 사용 방법</h3>
-                    </div>
-                    <div class="help-popup-body">
-                        <img src="data:image/png;base64,{help_image}" alt="사용 방법" class="help-popup-image">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        show_help_dialog()
+        # 다이얼로그가 닫히면 상태 초기화
+        st.session_state.show_help_popup = False
+        # 팝업 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
             
-            # 간단한 닫기 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ 팝업 닫기", key="close_help_popup", use_container_width=True):
-                st.session_state.show_help_popup = False
-                st.rerun()
+
+@st.dialog("❓ 자주하는 질문", width="large")
+def show_faq_dialog():
+    """자주하는 질문 다이얼로그"""
+    # 자주하는 질문.png 이미지 로드
+    faq_image = get_base64_image(get_file_path("assets/사진 모음/자주하는 질문.png"))
+    
+    if faq_image:
+        # 자주하는 질문 이미지 표시
+        st.image(f"data:image/png;base64,{faq_image}")
+    else:
+        st.error("자주하는 질문 이미지를 불러올 수 없습니다.")
 
 def render_faq_popup():
     """자주하는 질문 팝업을 렌더링하는 함수"""
     # 자주하는 질문 팝업 표시 상태 확인
     if st.session_state.get('show_faq_popup', False):
-        # 자주하는 질문.png 이미지 로드
-        faq_image = get_base64_image(get_file_path("assets/사진 모음/자주하는 질문.png"))
-        
-        if faq_image:
-            # 팝업 오버레이와 자주하는 질문 이미지 표시
-            st.markdown(f"""
-            <div id="faq-popup-overlay" class="faq-popup-overlay">
-                <div class="faq-popup-content">
-                    <div class="faq-popup-header">
-                        <h3>❓ 자주하는 질문</h3>
-                    </div>
-                    <div class="faq-popup-body">
-                        <img src="data:image/png;base64,{faq_image}" alt="자주하는 질문" class="map-popup-image">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        show_faq_dialog()
+        # 다이얼로그가 닫히면 상태 초기화
+        st.session_state.show_faq_popup = False
+        # 팝업 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
             
-            # 간단한 닫기 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ 팝업 닫기", key="close_faq_popup", use_container_width=True):
-                st.session_state.show_faq_popup = False
-                st.rerun()
+
+@st.dialog("📝 극본의 특성", width="large")
+def show_script_dialog():
+    """극본의 특성 다이얼로그"""
+    # 극본의 특성.png 이미지 로드
+    script_image = get_base64_image(get_file_path("assets/사진 모음/극본의 특성.png"))
+    
+    if script_image:
+        # 극본의 특성 이미지 표시
+        st.image(f"data:image/png;base64,{script_image}")
+    else:
+        st.error("극본의 특성 이미지를 불러올 수 없습니다.")
 
 def render_script_popup():
     """극본의 특성 팝업을 렌더링하는 함수"""
     # 극본의 특성 팝업 표시 상태 확인
     if st.session_state.get('show_script_popup', False):
-        # 극본의 특성.png 이미지 로드
-        script_image = get_base64_image(get_file_path("assets/사진 모음/극본의 특성.png"))
-        
-        if script_image:
-            # 팝업 오버레이와 극본의 특성 이미지 표시
-            st.markdown(f"""
-            <div id="script-popup-overlay" class="script-popup-overlay">
-                <div class="script-popup-content">
-                    <div class="script-popup-header">
-                        <h3>📝 극본의 특성</h3>
-                    </div>
-                    <div class="script-popup-body">
-                        <img src="data:image/png;base64,{script_image}" alt="극본의 특성" class="script-popup-image">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        show_script_dialog()
+        # 다이얼로그가 닫히면 상태 초기화
+        st.session_state.show_script_popup = False
+        # 팝업 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
             
-            # 간단한 닫기 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ 팝업 닫기", key="close_script_popup", use_container_width=True):
-                st.session_state.show_script_popup = False
-                st.rerun()
+
+@st.dialog("🎭 연극의 특성", width="large")
+def show_theater_dialog():
+    """연극의 특성 다이얼로그"""
+    # 연극의 특성.png 이미지 로드
+    theater_image = get_base64_image(get_file_path("assets/사진 모음/연극의 특성.png"))
+    
+    if theater_image:
+        # 연극의 특성 이미지 표시
+        st.image(f"data:image/png;base64,{theater_image}")
+    else:
+        st.error("연극의 특성 이미지를 불러올 수 없습니다.")
 
 def render_theater_popup():
     """연극의 특성 팝업을 렌더링하는 함수"""
     # 연극의 특성 팝업 표시 상태 확인
     if st.session_state.get('show_theater_popup', False):
-        # 연극의 특성.png 이미지 로드
-        theater_image = get_base64_image(get_file_path("assets/사진 모음/연극의 특성.png"))
-        
-        if theater_image:
-            # 팝업 오버레이와 연극의 특성 이미지 표시
-            st.markdown(f"""
-            <div id="theater-popup-overlay" class="theater-popup-overlay">
-                <div class="theater-popup-content">
-                    <div class="theater-popup-header">
-                        <h3>🎭 연극의 특성</h3>
-                    </div>
-                    <div class="theater-popup-body">
-                        <img src="data:image/png;base64,{theater_image}" alt="연극의 특성" class="theater-popup-image">
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        show_theater_dialog()
+        # 다이얼로그가 닫히면 상태 초기화
+        st.session_state.show_theater_popup = False
+        # 팝업 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
             
-            # 간단한 닫기 버튼
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("❌ 팝업 닫기", key="close_theater_popup", use_container_width=True):
-                st.session_state.show_theater_popup = False
-                st.rerun()
 
-def clear_village(village_number):
-    """Function called when a village is cleared"""
-    if 'cleared_villages' not in st.session_state:
-        st.session_state.cleared_villages = []
     
-    # Update village clear status (중복 방지)
-    if village_number not in st.session_state.cleared_villages:
-        st.session_state.cleared_villages.append(village_number)
-        
-        # Trigger badge board update
-        st.session_state.badge_updated = True
-        st.rerun()
 
 def play_bgm(bgm_path):
     """Function to play BGM"""
@@ -987,13 +1051,7 @@ def main():
     # Initialize session state
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "intro"
-    if 'cleared_villages' not in st.session_state:
-        st.session_state.cleared_villages = []
     
-
-    
-    # Render badge board (displayed on all pages)
-    render_badge_board()
     
     # Render map popup if needed (displayed on all pages)
     render_map_popup()
@@ -1011,23 +1069,56 @@ def main():
     render_theater_popup()
     
     # Page routing
+    # Show badge dialog if requested (one-at-a-time)
+    if st.session_state.get('show_badge_dialog', False):
+        show_badge_dialog(st.session_state.get('badge_image_filename', ''))
+        st.session_state.show_badge_dialog = False
+        # 뱃지 다이얼로그 닫힌 후 스크롤을 맨 위로
+        scroll_to_top()
+
     if st.session_state.current_page == "intro":
         intro_page()
     elif st.session_state.current_page == "adventure_map":
         adventure_map_page()
     elif st.session_state.current_page == "village":
+        if st.session_state.get('show_village_dialog'):
+            show_arrival_dialog(st.session_state.get('village_dialog_message', ''))
+            st.session_state.show_village_dialog = False
         village_page()
     elif st.session_state.current_page == "story_forest":
         story_forest_page()
-    elif st.session_state.current_page == "feedback_age":
-        feedback_age_page()
+    elif st.session_state.current_page == "feedback_page":
+        if st.session_state.get('show_feedback_dialog'):
+            show_arrival_dialog(st.session_state.get('feedback_dialog_message', ''))
+            st.session_state.show_feedback_dialog = False
+            # 다이얼로그 닫힌 후 초대장 듣기 버튼으로 스크롤
+            scroll_to_element("초대장-듣기-버튼")
+        feedback_page()
     elif st.session_state.current_page == "prepare_page":
+        if st.session_state.get('show_prepare_dialog'):
+            show_arrival_dialog(st.session_state.get('prepare_dialog_message', ''))
+            st.session_state.show_prepare_dialog = False
+            # 다이얼로그 닫힌 후 초대장 듣기 버튼으로 스크롤
+            scroll_to_element("초대장-듣기-버튼")
         prepare_page()
     elif st.session_state.current_page == "hwanho_page":
+        if st.session_state.get('show_hwanho_dialog'):
+            show_arrival_dialog(st.session_state.get('hwanho_dialog_message', ''))
+            st.session_state.show_hwanho_dialog = False
+            # 다이얼로그 닫힌 후 초대장 듣기 버튼으로 스크롤
+            scroll_to_element("초대장-듣기-버튼")
         hwanho_page()
     elif st.session_state.current_page == "memory_page":
+        if st.session_state.get('show_memory_dialog'):
+            show_arrival_dialog(st.session_state.get('memory_dialog_message', ''))
+            st.session_state.show_memory_dialog = False
+            # 다이얼로그 닫힌 후 초대장 듣기 버튼으로 스크롤
+            scroll_to_element("초대장-듣기-버튼")
         memory_page()
     elif st.session_state.current_page == "summary_page":
+        if st.session_state.get('show_summary_dialog'):
+            show_arrival_dialog(st.session_state.get('summary_dialog_message', ''))
+            st.session_state.show_summary_dialog = False
         summary_page()
     else:
         st.session_state.current_page = "intro"

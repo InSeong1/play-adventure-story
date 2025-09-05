@@ -1,35 +1,12 @@
 import streamlit as st
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu, clear_village
+from utils import get_file_path, get_base64_image, render_common_menu
 import os
 
 def prepare_page():
     """준비의 광장 페이지"""
-    # 이야기 숲 뱃지 획득 (2번째 마을 클리어)
-    if 'cleared_villages' not in st.session_state:
-        st.session_state.cleared_villages = []
     
-    if 2 not in st.session_state.cleared_villages:
-        st.session_state.cleared_villages.append(2)
-        st.session_state.badge_updated = True
     
-    # 페이지 상단으로 스크롤
-    st.markdown("""
-    <script>
-        // 즉시 맨 위로 스크롤
-        window.scrollTo(0, 0);
-        
-        // 페이지 로드 완료 후에도 맨 위로 스크롤
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                window.scrollTo(0, 0);
-            });
-        }
-    </script>
-    """, unsafe_allow_html=True)
     
-    # BGM 재생 - 준비의 광장 BGM
-    bgm_path = get_file_path("브금 모음/3. 준비의 광장.mp3")
-    play_bgm(bgm_path)
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -54,20 +31,17 @@ def prepare_page():
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
     
     # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation", 
-                    help="클릭하여 초대장 나레이션을 들을 수 있습니다",
+        if st.button("📜 초대장 듣기", key="listen_invitation_prepare", 
+                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
                     use_container_width=True):
-            st.session_state.show_narration = True
-            # BGM 음량을 절반으로 줄임
-            if 'bgm_volume' in st.session_state:
-                st.session_state.bgm_volume = 0.2
+            st.session_state["show_narration_prepare"] = not st.session_state.get("show_narration_prepare", False)
             st.rerun()
     
     # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration', False):
+    if st.session_state.get('show_narration_prepare', False):
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -91,33 +65,6 @@ def prepare_page():
                 st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
                 st.write(f"파일 경로: 나레이션 소리 모음/3.준비의 광장.mp3")
     
-    # 메인 콘텐츠
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
-    
-    # 이야기 숲 뱃지 표시
-    badge_path = get_file_path("뱃지 모음/2_뱃지_이야기숲.png")
-    badge_image = get_base64_image(badge_path)
-    
-    if badge_image:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("""
-            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
-                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
-                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 이야기 숲 뱃지 획득!</h3>
-                <div style="text-align: center;">
-                    <img src="data:image/png;base64,{badge_image}" 
-                         style="max-width: 150px; height: auto; border-radius: 10px; 
-                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
-                         alt="이야기 숲 뱃지">
-                </div>
-                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
-                    🎉 이야기 숲을 성공적으로 클리어했습니다!
-                </p>
-            </div>
-            """.format(badge_image=badge_image), unsafe_allow_html=True)
-    else:
-        st.error("뱃지 이미지를 불러올 수 없습니다.")
     
     # 준비의 광장 제목
     st.markdown("""
@@ -173,8 +120,9 @@ def prepare_page():
             final_script += f"**장면 수:** {village_data.get('scene_count', '')}개\n\n"
             final_script += f"**주제:** {village_data.get('theme', '')}\n\n"
             final_script += f"**이야기 흐름:** {village_data.get('story_flow', '')}\n\n"
+        st.markdown("---")
         
-        # 장면별 대본 추가 (feedback_age에서 입력한 내용)
+        # 장면별 대본 추가 (feedback_page에서 입력한 내용)
         # village_inputs에서 scene_count를 가져와서 사용
         scene_count = 0
         if 'village_inputs' in st.session_state and 'scene_count' in st.session_state.village_inputs:
@@ -187,13 +135,16 @@ def prepare_page():
             script = st.session_state.scene_inputs.get(script_key, "")
             
             if stage or script:
+                
                 final_script += f"## 장면 {scene_num}\n\n"
                 if stage:
-                    final_script += f"**배경경:** {stage}\n\n"
+                    final_script += f"**배경:** {stage}\n\n"
                 if script:
                     # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
                     formatted_script = script.replace('\n', '\n\n')
                     final_script += f"**대본:**\n{formatted_script}\n\n"
+                    final_script += "---\n\n\n\n"
+                
         
         # AI 피드백이 있다면 추가
         if 'generated_feedback' in st.session_state:
@@ -270,13 +221,30 @@ def prepare_page():
         with col1:
             st.markdown(f"**{i+1}.** {item}")
         with col2:
-            if st.checkbox("예", key=f"yes_{i}", value=st.session_state.prepare_checklist.get(f"yes_{i}", False)):
+            # 예 체크박스 - 현재 상태 확인
+            yes_current = st.session_state.prepare_checklist.get(f"yes_{i}", False)
+            yes_checked = st.checkbox("예", key=f"yes_{i}", value=yes_current)
+            
+            # 예가 체크되면 아니오 해제
+            if yes_checked and not yes_current:
                 st.session_state.prepare_checklist[f"yes_{i}"] = True
                 st.session_state.prepare_checklist[f"no_{i}"] = False
+                st.rerun()
+            elif not yes_checked and yes_current:
+                st.session_state.prepare_checklist[f"yes_{i}"] = False
+                
         with col3:
-            if st.checkbox("아니오", key=f"no_{i}", value=st.session_state.prepare_checklist.get(f"no_{i}", False)):
+            # 아니오 체크박스 - 현재 상태 확인
+            no_current = st.session_state.prepare_checklist.get(f"no_{i}", False)
+            no_checked = st.checkbox("아니오", key=f"no_{i}", value=no_current)
+            
+            # 아니오가 체크되면 예 해제
+            if no_checked and not no_current:
                 st.session_state.prepare_checklist[f"no_{i}"] = True
                 st.session_state.prepare_checklist[f"yes_{i}"] = False
+                st.rerun()
+            elif not no_checked and no_current:
+                st.session_state.prepare_checklist[f"no_{i}"] = False
     
     # 완료하기 버튼
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -311,13 +279,39 @@ def prepare_page():
     
     # 체크리스트 완료 후 다음 마을로 이동 버튼
     if st.session_state.get('checklist_completed', False):
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.success("✅ 연극 준비 체크리스트가 완료되었습니다!")
+        
+        
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🌲 다음 마을로", key="next_village", 
                         help="환호의 극장으로 이동합니다",
                         use_container_width=True):
+                # 다음 페이지 뱃지 설정 (준비의 광장 뱃지)
+                st.session_state.badge_image_filename = "3_뱃지_준비의 광장.png"
+                st.session_state.show_badge_dialog = True
                 st.session_state.current_page = "hwanho_page"
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 페이지 상단으로 스크롤 (모든 콘텐츠 로드 후 실행)
+    import streamlit.components.v1 as components
+    
+    def scroll_to_top():
+        components.html("""
+        <script>
+            // 모든 콘텐츠가 로드된 후 스크롤 실행
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 1000);
+            
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 2000);
+        </script>
+        """, height=0)
+    
+    scroll_to_top()

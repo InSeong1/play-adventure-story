@@ -1,12 +1,10 @@
 import streamlit as st
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu, generate_play_scenario
+from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario
 import os
 
 def village_page():
     """시작의 마을 페이지 (확장 가능한 구조)"""
-    # BGM 재생 - 시작의 마을 BGM (새로운 BGM)
-    bgm_path = get_file_path("브금 모음/1. 시작의 마을.mp3")
-    play_bgm(bgm_path)
+    
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -31,21 +29,18 @@ def village_page():
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
     
-    # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+
+    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation", 
-                    help="클릭하여 초대장을 들을 수 있습니다",
+        if st.button("📜 초대장 듣기", key="listen_invitation_village", 
+                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
                     use_container_width=True):
-            st.session_state.show_narration = True
-            # BGM 음량을 절반으로 줄임
-            if 'bgm_volume' in st.session_state:
-                st.session_state.bgm_volume = 0.2
+            st.session_state["show_narration_village"] = not st.session_state.get("show_narration_village", False)
             st.rerun()
     
     # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration', False):
+    if st.session_state.get('show_narration_village', False):
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -57,7 +52,7 @@ def village_page():
                 
                 # 나레이션 텍스트 내용 출력
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**📖 나레이션 내용:**")
+                st.markdown("**📖 초대장 내용:**")
                 try:
                     with open(get_file_path("나레이션/1.시작의 마을.txt"), "r", encoding="utf-8") as text_file:
                         narration_text = text_file.read()
@@ -69,8 +64,7 @@ def village_page():
                 st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
                 st.write(f"파일 경로: 나레이션 소리 모음/1.시작의 마을.mp3")
     
-    # 사용자 입력 폼 (스크롤 아래에 배치)
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
+
     
     # 입력 폼 제목
     st.markdown("""
@@ -85,73 +79,115 @@ def village_page():
     
     with col1:
         # 등장인물의 수
+        default_character_count = 1
+        if 'village_inputs' in st.session_state and 'character_count' in st.session_state.village_inputs:
+            default_character_count = st.session_state.village_inputs['character_count']
+        
         character_count = st.number_input(
             "👥 등장인물의 수\n(해설 역할은 제외하고 적어 주세요. 예. 해설, 흥부, 놀부 -> 2)",
             min_value=1,
             max_value=20,
-            value=1,
+            value=default_character_count,
             help="연극에 등장할 인물의 수를 입력하세요."
         )
         
         # 등장인물의 이름
         st.markdown("📝 **등장인물의 이름**")
+        default_character_names = ""
+        if 'village_inputs' in st.session_state and 'character_names' in st.session_state.village_inputs:
+            default_character_names = st.session_state.village_inputs['character_names']
+        
         character_names = st.text_area(
             "등장인물들의 이름을 쉼표(,)로 구분하여 입력하세요.",
+            value=default_character_names,
             placeholder="예: 홍길동, 김철수, 이영희...",
             help="여러 등장인물의 이름을 쉼표(,)로 구분하여 입력하세요."
         )
         
         # 연극 장르 입력
+        default_genre = ""
+        if 'village_inputs' in st.session_state and 'genre' in st.session_state.village_inputs:
+            default_genre = st.session_state.village_inputs['genre']
+        
         genre = st.text_input(
             "🎬 연극 장르",
+            value=default_genre,
             placeholder="예: 드라마, 코미디, 로맨스, 스릴러, 판타지, 역사극, 뮤지컬, 실험극, 기타...",
             help="연극의 장르를 직접 입력하세요."
         )
         
         # 연극 주제 입력 (왼쪽 칼럼 제일 아래)
+        default_theme = ""
+        if 'village_inputs' in st.session_state and 'theme' in st.session_state.village_inputs:
+            default_theme = st.session_state.village_inputs['theme']
+        
         theme = st.text_input(
             "🎯 연극 주제",
+            value=default_theme,
             placeholder="예: 착한 일을 하면 복을 받는다",
             help="'착한 일을 하면 복을 받는다.' '이야기 흐름 예시는 '가난하지만 마음씨 착한 주인공이 길에서 잃어버린 지갑을 주워 주인에게 돌려준다. 지갑 주인이 선행에 감동해 주인공이 위기에 처했을 때 도와준다.'"
         )
     
     with col2:
         # 시간적 배경
+        default_time_background = ""
+        if 'village_inputs' in st.session_state and 'time_background' in st.session_state.village_inputs:
+            default_time_background = st.session_state.village_inputs['time_background']
+        
         time_background = st.text_input(
             "⏰ 시간적 배경",
+            value=default_time_background,
             placeholder="예: 2025 년, 조선시대, 미래...",
             help="연극이 일어나는 시대나 시간을 입력하세요. 배경이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
         # 공간적 배경
+        default_space_background = ""
+        if 'village_inputs' in st.session_state and 'space_background' in st.session_state.village_inputs:
+            default_space_background = st.session_state.village_inputs['space_background']
+        
         space_background = st.text_input(
             "🏛️ 공간적 배경",
+            value=default_space_background,
             placeholder="예: 교실, 강당, 시청각실, 울산 대공원...",
             help="연극이 일어나는 장소나 공간을 입력하세요. 시간이 여러 개라면 쉼표로 구분하여 적어주세요."
         )
         
         # 공연 시간 (분 단위)
+        default_performance_time = 10
+        if 'village_inputs' in st.session_state and 'performance_time' in st.session_state.village_inputs:
+            default_performance_time = st.session_state.village_inputs['performance_time']
+        
         performance_time = st.number_input(
             "⏱️ 공연 시간 (분)",
             min_value=1,
             max_value=60,
-            value=10,
+            value=default_performance_time,
             help="예상 공연 시간을 분 단위로 입력하세요."
         )
         
         # 장면 수 (오른쪽 칼럼으로 이동)
+        default_scene_count = 1
+        if 'village_inputs' in st.session_state and 'scene_count' in st.session_state.village_inputs:
+            default_scene_count = st.session_state.village_inputs['scene_count']
+        
         scene_count = st.number_input(
             "🎭 장면 수",
             min_value=1,
             max_value=10,
-            value=1,
+            value=default_scene_count,
             help="연극의 총 장면 수를 입력하세요"
         )
         
         # 이야기 흐름 입력 (오른쪽 칼럼 가장 밑)
         st.markdown("<br>", unsafe_allow_html=True)
+        default_story_flow = ""
+        if 'village_inputs' in st.session_state and 'story_flow' in st.session_state.village_inputs:
+            default_story_flow = st.session_state.village_inputs['story_flow']
+        
         story_flow = st.text_area(
             "📖 이야기 흐름",
+            value=default_story_flow,
             placeholder="예: 가난하지만 마음씨 착한 주인공이 길에서 잃어버린 지갑을 주워 주인에게 돌려준다. 지갑 주인이 선행에 감동해 주인공이 위기에 처했을 때 도와준다.",
             help="연극의 주요 이야기 흐름을 자세히 설명해 주세요.",
             height=100
@@ -159,7 +195,7 @@ def village_page():
     
     # 입력 완료 버튼 (양쪽 칼럼을 합쳐서 큰 버튼)
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("✅ 입력 완료", key="submit_form", 
+    if st.button("✅ 입력 완료 (반드시 입력 완료 버튼으로 저장하세요!)", key="submit_form", 
                 help="입력한 정보를 저장합니다.",
                 use_container_width=True):
                 
@@ -265,20 +301,130 @@ def village_page():
                         'story_flow': story_flow
                     }
     
-            # 다음 마을로 모험 떠나기 버튼 (검증 통과 후에만 표시)
+    # 대본 설정 다운로드/업로드 버튼들
+    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.button("📥 대본 설정 다운로드", key="download_settings",
+                    help="현재 입력된 설정을 txt 파일로 다운로드합니다.",
+                    use_container_width=True):
+            # 다운로드할 내용 생성
+            download_content = ""
+            if 'village_inputs' in st.session_state:
+                inputs = st.session_state.village_inputs
+                download_content += f"### 등장인물 수 ###\n{inputs.get('character_count', '')}\n\n"
+                download_content += f"### 등장인물의 이름 ###\n{inputs.get('character_names', '')}\n\n"
+                download_content += f"### 연극 장르 ###\n{inputs.get('genre', '')}\n\n"
+                download_content += f"### 시간적 배경 ###\n{inputs.get('time_background', '')}\n\n"
+                download_content += f"### 공간적 배경 ###\n{inputs.get('space_background', '')}\n\n"
+                download_content += f"### 공연 시간 ###\n{inputs.get('performance_time', '')}\n\n"
+                download_content += f"### 장면 수 ###\n{inputs.get('scene_count', '')}\n\n"
+                download_content += f"### 연극 주제 ###\n{inputs.get('theme', '')}\n\n"
+                download_content += f"### 이야기 흐름 ###\n{inputs.get('story_flow', '')}\n\n"
+            else:
+                download_content = "저장된 설정이 없습니다."
+            
+            # 다운로드 버튼 생성
+            st.download_button(
+                label="📥 설정 파일 다운로드",
+                data=download_content,
+                file_name="연극_대본_설정.txt",
+                mime="text/plain",
+                key="download_file"
+            )
+            # 다운로드 버튼 클릭 후 상태 초기화
+            st.session_state.download_settings = False
+    
+    with col2:
+        # 업로드 완료되지 않은 경우에만 파일 업로더 표시
+        if not st.session_state.get('upload_completed', False):
+            uploaded_file = st.file_uploader("📤 대본 설정 업로드", 
+                                           type=['txt'],
+                                           help="이전에 다운로드한 설정 파일을 업로드하여 자동으로 입력합니다.",
+                                           key="upload_settings")
+            
+            if uploaded_file is not None:
+                try:
+                    # 파일 내용 읽기
+                    content = uploaded_file.read().decode('utf-8')
+                    
+                    # 파싱하여 세션 상태에 저장
+                    parsed_data = {}
+                    sections = content.split('### ')
+                    
+                    for section in sections[1:]:  # 첫 번째 빈 섹션 제외
+                        if '###' in section:
+                            lines = section.split('\n')
+                            title = lines[0].replace('###', '').strip()
+                            value = '\n'.join(lines[1:]).strip()
+                            
+                            # 제목을 세션 상태 키로 매핑
+                            if title == "등장인물 수":
+                                parsed_data['character_count'] = int(value) if value.isdigit() else 1
+                            elif title == "등장인물의 이름":
+                                parsed_data['character_names'] = value
+                            elif title == "연극 장르":
+                                parsed_data['genre'] = value
+                            elif title == "시간적 배경":
+                                parsed_data['time_background'] = value
+                            elif title == "공간적 배경":
+                                parsed_data['space_background'] = value
+                            elif title == "공연 시간":
+                                parsed_data['performance_time'] = int(value) if value.isdigit() else 10
+                            elif title == "장면 수":
+                                parsed_data['scene_count'] = int(value) if value.isdigit() else 1
+                            elif title == "연극 주제":
+                                parsed_data['theme'] = value
+                            elif title == "이야기 흐름":
+                                parsed_data['story_flow'] = value
+                    
+                    # 세션 상태에 저장
+                    st.session_state.village_inputs = parsed_data
+                    st.success("✅ 설정 파일이 성공적으로 업로드되었습니다!")
+                    # 업로드 완료 플래그 설정
+                    st.session_state.upload_completed = True
+                    st.rerun()
+                    
+                except Exception as e:
+                    st.error(f"❌ 파일 업로드 중 오류가 발생했습니다: {str(e)}")
+        else:
+            # 업로드 완료된 경우 성공 메시지 표시
+            st.success("✅ 설정 파일이 성공적으로 업로드되었습니다!")
+            if st.button("🔄 다시 업로드하기", key="reupload_button"):
+                st.session_state.upload_completed = False
+                st.rerun()
+    
+    # 다음 마을로 모험 떠나기 버튼 (검증 통과 후에만 표시)
     if 'village_inputs' in st.session_state:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🚀 다음 마을로 모험 떠나기", key="next_village", 
                     help="다음 마을로 이동합니다.",
                     use_container_width=True):
-            # 시작의 마을 클리어 (자동으로)
-            if 'cleared_villages' not in st.session_state:
-                st.session_state.cleared_villages = []
-            if 1 not in st.session_state.cleared_villages:
-                st.session_state.cleared_villages.append(1)
-            
-            # feedback_age.py 페이지로 이동
-            st.session_state.current_page = "feedback_age"
+            # 다음 페이지에 표시할 뱃지 설정 (시작의 마을 뱃지)
+            st.session_state.badge_image_filename = "1_뱃지_시작의 마을.png"
+            st.session_state.show_badge_dialog = True
+            # feedback_page.py 페이지로 이동
+            st.session_state.current_page = "feedback_page"
             st.rerun()
     
-  
+    # 페이지 상단으로 스크롤 (모든 콘텐츠 로드 후 실행)
+    import streamlit.components.v1 as components
+    
+    def scroll_to_top():
+        components.html("""
+        <script>
+            // 모든 콘텐츠가 로드된 후 스크롤 실행
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 1000);
+            
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 2000);
+        </script>
+        """, height=0)
+    
+    scroll_to_top()

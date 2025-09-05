@@ -1,38 +1,41 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu
-import os
+from utils import get_file_path, get_base64_image, render_common_menu
+
+
 
 def summary_page():
     """활동 요약 페이지"""
-    # 추억의 언덕 뱃지 획득 (5번째 마을 클리어)
-    if 'cleared_villages' not in st.session_state:
-        st.session_state.cleared_villages = []
     
-    if 5 not in st.session_state.cleared_villages:
-        st.session_state.cleared_villages.append(5)
-        st.session_state.badge_updated = True
     
-    # 페이지 상단으로 스크롤
-    js = '''
-    <script>
-        var body = window.parent.document.querySelector(".main");
-        if (body) {
-            body.scrollTop = 0;
-        }
-    </script>
-    '''
-    components.html(js, height=0)
     
-    # BGM 재생 - 시상식 BGM
-    bgm_path = get_file_path("브금 모음/시상식.mp3")
-    play_bgm(bgm_path)
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
+    # 인쇄 버튼 (페이지 상단)
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <button onclick="window.print()" style="
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" 
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
+            완주 증서
+        </button>
+    </div>
+    """, unsafe_allow_html=True)
+    
     # 메인 콘텐츠를 감싸는 컨테이너
-    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    st.markdown('<div class="main-content" id="summary-page-top">', unsafe_allow_html=True)
     
     # 시상식 상 이미지
     st.markdown("""
@@ -73,8 +76,7 @@ def summary_page():
     else:
         st.error("마무리 편지 이미지를 불러올 수 없습니다.")
     
-    # 활동 내용 요약 섹션
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
         <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 2rem;">📚 나의 연극 대모험 여정</h2>
@@ -278,8 +280,7 @@ def summary_page():
     else:
         st.info("추억의 언덕에서 작성한 답변이 없습니다.")
     
-    # 마무리 메시지
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+
     st.markdown("""
     <div style="text-align: center; padding: 3rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                 border-radius: 20px; color: white; margin: 2rem 0;">
@@ -292,4 +293,14 @@ def summary_page():
     </div>
     """, unsafe_allow_html=True)
     
+    # 간단한 인쇄 안내
+    st.markdown("""
+    <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 15px; border-left: 4px solid #2E86AB; margin: 2rem 0;">
+        <h4 style="color: #2E86AB; margin-bottom: 1rem;">💡 PDF 저장 팁</h4>
+        <p style="margin-bottom: 0.5rem; color: #333;"><strong>위의 버튼을 클릭하거나</strong> <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Ctrl</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Windows/Linux) 또는 <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Mac)을 눌러주세요!</p>
+        <p style="margin-bottom: 0; color: #333;"><strong>인쇄 창에서:</strong> 대상을 "PDF로 저장"으로 변경하고, "배경 그래픽" 옵션을 체크하면 색상과 이미지가 포함된 완벽한 PDF를 만들 수 있습니다.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.markdown('</div>', unsafe_allow_html=True)
+    

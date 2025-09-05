@@ -1,27 +1,13 @@
 import streamlit as st
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu, generate_play_scenario
+from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario
 import os
 
-def feedback_age_page():
+def feedback_page():
     """피드백 페이지 (이야기 숲)"""
-    # 페이지 상단으로 스크롤
-    st.markdown("""
-    <script>
-        // 즉시 맨 위로 스크롤
-        window.scrollTo(0, 0);
-        
-        // 페이지 로드 완료 후에도 맨 위로 스크롤
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                window.scrollTo(0, 0);
-            });
-        }
-    </script>
-    """, unsafe_allow_html=True)
+    # 페이지 상단으로 스크롤 (streamlit.components.v1 사용)
+    import streamlit.components.v1 as components
     
-    # BGM 재생 - 이야기 숲 BGM
-    bgm_path = get_file_path("브금 모음/2. 이야기 숲.mp3")
-    play_bgm(bgm_path)
+    
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -36,7 +22,7 @@ def feedback_age_page():
     if invitation_image:
         # 이미지를 CSS 클래스를 사용하여 적절한 크기로 표시
         st.markdown(f"""
-        <div class="image-container">
+        <div id="초대장-이미지" class="image-container">
             <img src="data:image/png;base64,{invitation_image}" alt="이야기 숲 초대장">
         </div>
         """, unsafe_allow_html=True)
@@ -46,20 +32,17 @@ def feedback_age_page():
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
     
     # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation", 
-                    help="클릭하여 초대장 나레이션을 들을 수 있습니다",
+        if st.button("📜 초대장 듣기", key="listen_invitation_feedback_page", 
+                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
                     use_container_width=True):
-            st.session_state.show_narration = True
-            # BGM 음량을 절반으로 줄임
-            if 'bgm_volume' in st.session_state:
-                st.session_state.bgm_volume = 0.2
+            st.session_state["show_narration_feedback_page"] = not st.session_state.get("show_narration_feedback_page", False)
             st.rerun()
     
     # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration', False):
+    if st.session_state.get('show_narration_feedback_page', False):
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -82,37 +65,7 @@ def feedback_age_page():
             except Exception as e:
                 st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
                 st.write(f"파일 경로: 나레이션 소리 모음/2.이야기 숲.mp3")
-    
-    # 시작의 마을 뱃지 표시
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
-    
-    # 시작의 마을 뱃지 표시
-    badge_path = get_file_path("뱃지 모음/1_뱃지_시작의 마을.png")
-    badge_image = get_base64_image(badge_path)
-    
-    if badge_image:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("""
-            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
-                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
-                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 시작의 마을 뱃지 획득!</h3>
-                <div style="text-align: center;">
-                    <img src="data:image/png;base64,{badge_image}" 
-                         style="max-width: 150px; height: auto; border-radius: 10px; 
-                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
-                         alt="시작의 마을 뱃지">
-                </div>
-                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
-                    🎉 시작의 마을을 성공적으로 클리어했습니다!
-                </p>
-            </div>
-            """.format(badge_image=badge_image), unsafe_allow_html=True)
-    else:
-        st.error("뱃지 이미지를 불러올 수 없습니다.")
-    
-    # 사용자 입력 폼 (스크롤 아래에 배치)
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
+
     
     # 입력 폼 제목
     st.markdown("""
@@ -219,7 +172,15 @@ def feedback_age_page():
             """, unsafe_allow_html=True)
         
         # 장면별 무대와 대본 입력
-        st.markdown("### 🎭 장면별 대본 작성")
+        st.markdown('<div id="장면별-대본-작성"></div>', unsafe_allow_html=True)
+        
+        # 제목과 외부 링크 버튼을 2열로 배치
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown("### 🎭 장면별 대본 작성")
+        with col2:
+            st.link_button("🐉 대본 작성에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="연극 용과 함께 대본 작성을 시작해 볼까요?")
+        
         st.markdown("---")
         
         # 장면별 입력을 저장할 딕셔너리 초기화
@@ -356,7 +317,7 @@ def feedback_age_page():
         # 생성된 피드백 표시
         if 'generated_feedback' in st.session_state:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("### 💬 AI 피드백")
+            st.markdown("### 💬 AI 피드백 (👍표시는 잘한점, ✏ 표시는 고쳐야할 점 입니다.)")
             st.markdown("---")
             
             # AI 응답의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
@@ -370,7 +331,7 @@ def feedback_age_page():
             <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 10px; margin: 1rem 0;">
                 <h4 style="color: #2E86AB; margin-bottom: 0.5rem;">📝 대본 수정 안내</h4>
                 <p style="color: #666; margin: 0;">
-                    위의 AI 피드백을 바탕으로 <strong>장면별 대본 작성</strong> 섹션에서 대본을 수정해 보세요.<br>
+                    위의 AI 피드백을 바탕으로 <a href="#장면별-대본-작성" style="color: #2E86AB; text-decoration: none; font-weight: bold; cursor: pointer;">장면별 대본 작성</a> 섹션에서 대본을 수정해 보세요.<br>
                     수정 후 다시 AI 피드백을 받을 수 있습니다.
                 </p>
             </div>
@@ -378,12 +339,14 @@ def feedback_age_page():
             
             # 다음 마을로 이동 버튼 (피드백을 최소 1번 받았을 때만 표시)
             if st.session_state.get('feedback_count', 0) > 0:
-                st.markdown("<br><br>", unsafe_allow_html=True)
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
                     if st.button("🌲 다음 마을로", key="next_village", 
                                 help="준비의 광장으로 이동합니다",
                                 use_container_width=True):
+                        # 다음 페이지 뱃지 설정 (이야기 숲 뱃지)
+                        st.session_state.badge_image_filename = "2_뱃지_이야기숲.png"
+                        st.session_state.show_badge_dialog = True
                         st.session_state.current_page = "prepare_page"
                         st.rerun()
             else:
@@ -403,3 +366,4 @@ def feedback_age_page():
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+

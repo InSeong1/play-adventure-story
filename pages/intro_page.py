@@ -1,11 +1,8 @@
 import streamlit as st
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu
+from utils import get_file_path, get_base64_image, render_common_menu
 
 def intro_page():
     """인트로 페이지"""
-    # BGM 재생 - 인트로 페이지 BGM
-    bgm_path = get_file_path("브금 모음/첫 시작 bgm.mp3")
-    play_bgm(bgm_path)
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -24,8 +21,6 @@ def intro_page():
         </div>
         """, unsafe_allow_html=True)
     
-    # 모험 시작하기 버튼 - 가운데 정렬, 크게, 그림에서 한 칸 떨어지게
-    st.markdown("<br><br><br>", unsafe_allow_html=True)  # 그림에서 한 칸 떨어지게
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("🚀 모험 시작하기", key="start_adventure", 

@@ -2,3 +2,4 @@ streamlit
 pillow
 streamlit-option-menu
 openai
+streamlit[pdf]

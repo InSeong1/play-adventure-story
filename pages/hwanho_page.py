@@ -1,35 +1,12 @@
 import streamlit as st
-from utils import play_bgm, get_file_path, get_base64_image, render_common_menu
+from utils import get_file_path, get_base64_image, render_common_menu
 import os
 
 def hwanho_page():
     """환호의 극장 페이지"""
-    # 준비의 광장 뱃지 획득 (3번째 마을 클리어)
-    if 'cleared_villages' not in st.session_state:
-        st.session_state.cleared_villages = []
     
-    if 3 not in st.session_state.cleared_villages:
-        st.session_state.cleared_villages.append(3)
-        st.session_state.badge_updated = True
     
-    # 페이지 상단으로 스크롤
-    st.markdown("""
-    <script>
-        // 즉시 맨 위로 스크롤
-        window.scrollTo(0, 0);
-        
-        // 페이지 로드 완료 후에도 맨 위로 스크롤
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                window.scrollTo(0, 0);
-            });
-        }
-    </script>
-    """, unsafe_allow_html=True)
     
-    # BGM 재생 - 환호의 극장 BGM
-    bgm_path = get_file_path("브금 모음/4. 환호의 극장.mp3")
-    play_bgm(bgm_path)
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -53,21 +30,17 @@ def hwanho_page():
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
     
-    # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
+    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation", 
-                    help="클릭하여 초대장 나레이션을 들을 수 있습니다",
+        if st.button("📜 초대장 듣기", key="listen_invitation_hwanho", 
+                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
                     use_container_width=True):
-            st.session_state.show_narration = True
-            # BGM 음량을 절반으로 줄임
-            if 'bgm_volume' in st.session_state:
-                st.session_state.bgm_volume = 0.2
+            st.session_state["show_narration_hwanho"] = not st.session_state.get("show_narration_hwanho", False)
             st.rerun()
     
     # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration', False):
+    if st.session_state.get('show_narration_hwanho', False):
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -91,33 +64,6 @@ def hwanho_page():
                 st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
                 st.write(f"파일 경로: 나레이션 소리 모음/4.환호의 극장.mp3")
     
-    # 메인 콘텐츠
-    st.markdown("<br><br><br><br><br><br>", unsafe_allow_html=True)
-    
-    # 준비의 광장 뱃지 표시
-    badge_path = get_file_path("뱃지 모음/3_뱃지_준비의 광장.png")
-    badge_image = get_base64_image(badge_path)
-    
-    if badge_image:
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("""
-            <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 15px; 
-                         box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2); margin: 1rem 0;">
-                <h3 style="color: #2E86AB; margin-bottom: 1rem;">🏆 준비의 광장 뱃지 획득!</h3>
-                <div style="text-align: center;">
-                    <img src="data:image/png;base64,{badge_image}" 
-                         style="max-width: 150px; height: auto; border-radius: 10px; 
-                                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);" 
-                         alt="준비의 광장 뱃지">
-                </div>
-                <p style="color: #666; font-size: 1rem; margin-top: 1rem; font-weight: bold;">
-                    🎉 준비의 광장을 성공적으로 클리어했습니다!
-                </p>
-            </div>
-            """.format(badge_image=badge_image), unsafe_allow_html=True)
-    else:
-        st.error("준비의 광장 뱃지 이미지를 불러올 수 없습니다.")
     
     # 환호의 극장 제목
     st.markdown("""
@@ -146,7 +92,7 @@ def hwanho_page():
         st.write(f"파일 존재 여부: {os.path.exists(etiquette_image_path)}")
     
     # 체크리스트 섹션
-    st.markdown("<br><br>", unsafe_allow_html=True)
+
     st.markdown("### 📋 연극 공연 체크리스트")
     st.markdown("---")
     
@@ -169,13 +115,30 @@ def hwanho_page():
         with col1:
             st.markdown(f"**{i+1}.** {item}")
         with col2:
-            if st.checkbox("예", key=f"performer_yes_{i}", value=st.session_state.performance_checklist.get(f"performer_yes_{i}", False)):
+            # 예 체크박스 - 현재 상태 확인
+            yes_current = st.session_state.performance_checklist.get(f"performer_yes_{i}", False)
+            yes_checked = st.checkbox("예", key=f"performer_yes_{i}", value=yes_current)
+            
+            # 예가 체크되면 아니오 해제
+            if yes_checked and not yes_current:
                 st.session_state.performance_checklist[f"performer_yes_{i}"] = True
                 st.session_state.performance_checklist[f"performer_no_{i}"] = False
+                st.rerun()
+            elif not yes_checked and yes_current:
+                st.session_state.performance_checklist[f"performer_yes_{i}"] = False
+                
         with col3:
-            if st.checkbox("아니오", key=f"performer_no_{i}", value=st.session_state.performance_checklist.get(f"performer_no_{i}", False)):
+            # 아니오 체크박스 - 현재 상태 확인
+            no_current = st.session_state.performance_checklist.get(f"performer_no_{i}", False)
+            no_checked = st.checkbox("아니오", key=f"performer_no_{i}", value=no_current)
+            
+            # 아니오가 체크되면 예 해제
+            if no_checked and not no_current:
                 st.session_state.performance_checklist[f"performer_no_{i}"] = True
                 st.session_state.performance_checklist[f"performer_yes_{i}"] = False
+                st.rerun()
+            elif not no_checked and no_current:
+                st.session_state.performance_checklist[f"performer_no_{i}"] = False
     
     st.markdown("<br>", unsafe_allow_html=True)
     
@@ -194,16 +157,32 @@ def hwanho_page():
         with col1:
             st.markdown(f"**{i+1}.** {item}")
         with col2:
-            if st.checkbox("예", key=f"audience_yes_{i}", value=st.session_state.performance_checklist.get(f"audience_yes_{i}", False)):
+            # 예 체크박스 - 현재 상태 확인
+            yes_current = st.session_state.performance_checklist.get(f"audience_yes_{i}", False)
+            yes_checked = st.checkbox("예", key=f"audience_yes_{i}", value=yes_current)
+            
+            # 예가 체크되면 아니오 해제
+            if yes_checked and not yes_current:
                 st.session_state.performance_checklist[f"audience_yes_{i}"] = True
                 st.session_state.performance_checklist[f"audience_no_{i}"] = False
+                st.rerun()
+            elif not yes_checked and yes_current:
+                st.session_state.performance_checklist[f"audience_yes_{i}"] = False
+                
         with col3:
-            if st.checkbox("아니오", key=f"audience_no_{i}", value=st.session_state.performance_checklist.get(f"audience_no_{i}", False)):
+            # 아니오 체크박스 - 현재 상태 확인
+            no_current = st.session_state.performance_checklist.get(f"audience_no_{i}", False)
+            no_checked = st.checkbox("아니오", key=f"audience_no_{i}", value=no_current)
+            
+            # 아니오가 체크되면 예 해제
+            if no_checked and not no_current:
                 st.session_state.performance_checklist[f"audience_no_{i}"] = True
                 st.session_state.performance_checklist[f"audience_yes_{i}"] = False
+                st.rerun()
+            elif not no_checked and no_current:
+                st.session_state.performance_checklist[f"audience_no_{i}"] = False
     
     # 완료하기 버튼
-    st.markdown("<br><br>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         if st.button("✅ 체크리스트 완료하기", key="complete_performance_checklist", 
@@ -248,13 +227,38 @@ def hwanho_page():
     
     # 체크리스트 완료 후 다음 마을로 이동 버튼
     if st.session_state.get('performance_checklist_completed', False):
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.success("✅ 연극 공연 체크리스트가 완료되었습니다!")
+        
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             if st.button("🌲 다음 마을로", key="next_village", 
                         help="다음 마을로 이동합니다",
                         use_container_width=True):
+                # 다음 페이지 뱃지 설정 (환호의 극장 뱃지)
+                st.session_state.badge_image_filename = "4_뱃지_환호의 극장.png"
+                st.session_state.show_badge_dialog = True
                 st.session_state.current_page = "memory_page"
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 페이지 상단으로 스크롤 (모든 콘텐츠 로드 후 실행)
+    import streamlit.components.v1 as components
+    
+    def scroll_to_top():
+        components.html("""
+        <script>
+            // 모든 콘텐츠가 로드된 후 스크롤 실행
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 1000);
+            
+            setTimeout(function() {
+                window.parent.scrollTo(0, 0);
+                window.parent.scrollTo(0, -1000);
+            }, 2000);
+        </script>
+        """, height=0)
+    
+    scroll_to_top()

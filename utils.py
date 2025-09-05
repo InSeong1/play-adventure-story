@@ -45,38 +45,7 @@ def get_base64_image(file_path):
 
         return None
 
-def play_bgm(audio_file, autoplay=True, loop=True):
-    """BGM을 재생하는 함수"""
-    # BGM을 세션 상태에 저장
-    st.session_state.current_bgm = audio_file
-    
-    try:
-        with open(audio_file, "rb") as audio_file_obj:
-            # BGM 오디오 플레이어 표시 (최소 사이즈)
-            st.markdown("""
-            <div class="audio-player-container">
-                <div class="audio-label">🎵 배경 음악</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Streamlit 오디오 플레이어 (작은 사이즈)
-            st.audio(audio_file_obj.read(), format="audio/mp3")
-            
-    except Exception as e:
-        st.error(f"🎵 BGM 파일을 불러올 수 없습니다: {str(e)}")
-        st.write(f"파일 경로: {audio_file}")
 
-def stop_bgm():
-    """BGM을 정지하는 함수"""
-    st.markdown("""
-    <script>
-        const audio = document.getElementById('bgm-player');
-        if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-        }
-    </script>
-    """, unsafe_allow_html=True)
 
 def render_common_menu():
     """공통 메뉴를 렌더링하는 함수"""
@@ -84,6 +53,13 @@ def render_common_menu():
     
     if st.sidebar.button("🏠 홈으로", use_container_width=True):
         st.session_state.current_page = "intro"
+        st.rerun()
+    
+    if st.sidebar.button("📖 사용 방법", use_container_width=True):
+        # 사용 방법 팝업 표시 상태를 토글
+        if 'show_help_popup' not in st.session_state:
+            st.session_state.show_help_popup = False
+        st.session_state.show_help_popup = not st.session_state.show_help_popup
         st.rerun()
     
     if st.sidebar.button("🗺️ 지도 보기", use_container_width=True):
@@ -105,13 +81,6 @@ def render_common_menu():
         if 'show_script_popup' not in st.session_state:
             st.session_state.show_script_popup = False
         st.session_state.show_script_popup = not st.session_state.show_script_popup
-        st.rerun()
-    
-    if st.sidebar.button("📖 사용 방법", use_container_width=True):
-        # 사용 방법 팝업 표시 상태를 토글
-        if 'show_help_popup' not in st.session_state:
-            st.session_state.show_help_popup = False
-        st.session_state.show_help_popup = not st.session_state.show_help_popup
         st.rerun()
     
     if st.sidebar.button("❓ 자주하는 질문", use_container_width=True):
@@ -186,8 +155,8 @@ def show_badge_popup(village_number):
                 if st.button("🌲 다음 마을로 넘어가기", 
                             help="피드백 나이 페이지로 이동합니다",
                             use_container_width=True):
-                    st.session_state.current_page = "feedback_age"
-                    st.switch_page("pages/feedback_age.py")
+                    st.session_state.current_page = "feedback_page"
+                    st.switch_page("pages/feedback_page.py")
         else:
             st.error("뱃지 이미지를 불러올 수 없습니다.")
     else:
