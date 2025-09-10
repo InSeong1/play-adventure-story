@@ -162,6 +162,33 @@ def show_badge_popup(village_number):
     else:
         st.error(f"뱃지 파일을 찾을 수 없습니다: {badge_path}")
 
+def play_bgm(bgm_filename):
+    """BGM을 재생하는 함수 - 연속 재생을 위해 항상 표시"""
+    try:
+        bgm_path = get_file_path(f"브금 모음/{bgm_filename}")
+        
+        if os.path.exists(bgm_path):
+            # BGM 정보를 세션에 저장
+            st.session_state.current_bgm = bgm_filename
+            
+            # BGM 오디오 플레이어 표시 (가운데에 배치)
+            col1, col2, col3 = st.columns([1, 2, 1])
+            
+            with col2:
+                st.markdown("🎵 배경음악", help="BGM")
+                with open(bgm_path, 'rb') as audio_file:
+                    st.audio(
+                        audio_file.read(),
+                        format='audio/mp3',
+                        start_time=0,
+                        sample_rate=None,
+                        autoplay=False  # 자동재생 비활성화
+                    )
+        else:
+            st.error(f"BGM 파일을 찾을 수 없습니다: {bgm_path}")
+    except Exception as e:
+        st.error(f"BGM 재생 오류: {str(e)}")
+
 def generate_play_scenario(prompt):
     """OpenAI API를 사용하여 연극 시나리오를 생성하는 함수"""
     # API 키를 자동으로 가져오기

@@ -103,7 +103,7 @@ def prepare_page():
     if 'scene_inputs' in st.session_state and st.session_state.scene_inputs:
         st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("### 📖 최종 대본")
-        st.markdown("---")
+
         
         # 극본 내용 구성 - village_inputs에서 기본 정보 가져오기
         final_script = ""
@@ -119,7 +119,9 @@ def prepare_page():
             final_script += f"**공연 시간:** {village_data.get('performance_time', '')}분\n\n"
             final_script += f"**장면 수:** {village_data.get('scene_count', '')}개\n\n"
             final_script += f"**주제:** {village_data.get('theme', '')}\n\n"
-            final_script += f"**이야기 흐름:** {village_data.get('story_flow', '')}\n\n"
+            final_script += f"**이야기 흐름:** {village_data.get('story_flow', '')}\n\n ---\n\n"
+        
+        # 기본 정보와 장면 사이에 구분선 추가
         st.markdown("---")
         
         # 장면별 대본 추가 (feedback_page에서 입력한 내용)
@@ -135,7 +137,6 @@ def prepare_page():
             script = st.session_state.scene_inputs.get(script_key, "")
             
             if stage or script:
-                
                 final_script += f"## 장면 {scene_num}\n\n"
                 if stage:
                     final_script += f"**배경:** {stage}\n\n"
@@ -143,14 +144,47 @@ def prepare_page():
                     # 대본의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
                     formatted_script = script.replace('\n', '\n\n')
                     final_script += f"**대본:**\n{formatted_script}\n\n"
-                    final_script += "---\n\n\n\n"
+                
+                # 마지막 장면이 아니면 구분선 추가
+                if scene_num < scene_count:
+                    final_script += "---\n\n"
                 
         
-        # AI 피드백이 있다면 추가
+        # AI 피드백이 있다면 추가 (feedback_page와 동일한 포맷팅)
         if 'generated_feedback' in st.session_state:
-            # AI 피드백의 줄바꿈 한 개를 줄바꿈 두 개로 변환
-            formatted_feedback = st.session_state.generated_feedback.replace('\n', '\n\n')
-            final_script += f"## AI 피드백\n\n{formatted_feedback}\n\n"
+            final_script += "## AI 피드백\n\n"
+            final_script += "**👍 표시는 잘한점, ✏ 표시는 고쳐야할 점 입니다.**\n\n"
+            final_script += "---\n\n"
+            
+            # AI 응답을 더 보기 좋게 포맷팅 (feedback_page와 동일)
+            feedback_text = st.session_state.generated_feedback
+            
+            # 질문 부분을 헤더로 변환
+            import re
+            
+            # 더 정확한 질문 패턴 찾기 (줄의 시작에서 시작하는 질문만)
+            lines = feedback_text.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                line = line.strip()
+                # 줄의 시작이 질문인지 확인 (한글 + 물음표로 끝나는 문장)
+                if line and line.endswith('?') and len(line) > 10:
+                    # 질문을 헤더로 변환
+                    formatted_lines.append(f"## {line}")
+                elif line.startswith("총평:"):
+                    # 총평 부분을 헤더로 변환하고 나머지 내용도 포함
+                    remaining_content = line[3:].strip()  # "총평:" 제거
+                    if remaining_content:
+                        formatted_lines.append(f"## 총평")
+                        formatted_lines.append(remaining_content)
+                    else:
+                        formatted_lines.append(f"## 총평")
+                else:
+                    formatted_lines.append(line)
+            
+            formatted_feedback = '\n'.join(formatted_lines)
+            final_script += f"{formatted_feedback}\n\n"
         
         # 극본 내용 표시
         st.markdown(final_script)

@@ -1,9 +1,12 @@
 import streamlit as st
 import os
-from utils import get_file_path, get_base64_image, render_common_menu
+from utils import get_file_path, get_base64_image, render_common_menu, play_bgm
 
 def adventure_map_page():
     """연극 대모험 지도 페이지"""
+    
+    # BGM 재생 (인트로와 동일한 BGM으로 이어짐)
+    play_bgm("0. 인트로 지도.mp3")
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -29,13 +32,37 @@ def adventure_map_page():
         st.write(f"파일 경로: {get_file_path('사진 모음/전체 지도.png')}")
         st.write(f"파일 존재 여부: {os.path.exists(get_file_path('사진 모음/전체 지도.png'))}")
     
+    # 지도 나레이션 듣기 버튼
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🗺️ 지도 설명해주세요!", key="listen_map_narration", 
+                    help="클릭하여 지도 설명을 들을 수 있어요!",
+                    use_container_width=True):
+            st.session_state["show_map_narration"] = not st.session_state.get("show_map_narration", False)
+            st.rerun()
+    
+    # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
+    if st.session_state.get('show_map_narration', False):
+        st.markdown("<br>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown("**🎧 지도 설명 듣기**")
+            # 나레이션 오디오 파일 재생
+            try:
+                with open(get_file_path("나레이션 소리 모음/지도 나레이션.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+                
+            except Exception as e:
+                st.error(f"지도 설명 파일을 불러올 수 없습니다: {str(e)}")
+                st.write(f"파일 경로: 나레이션 소리 모음/지도 나레이션.mp3")
+    
     # 시작의 마을로 출발하기 버튼 - 나중에 추가할 버튼들을 위한 위치 확보
     st.markdown(
     """
     <div style="text-align: center;">
         <b>연극 대모험을 떠날 준비가 되었나요? 오늘 탐험할 마을들이에요.</b><br>
         시작의 마을에서 먼저 연극 대본을 구성해볼 거예요.<br>
-        모험을 떠날 준비가 되었다면 아래의 버튼을 눌러 출발해봐요요!
+        모험을 떠날 준비가 되었다면 아래의 버튼을 눌러 출발해봐요!
     </div>
     """,
     unsafe_allow_html=True

@@ -1,10 +1,12 @@
 import streamlit as st
-from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario
+from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
 import os
 
 def village_page():
     """시작의 마을 페이지 (확장 가능한 구조)"""
     
+    # BGM 재생
+    play_bgm("1. 시작의 마을.mp3")
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -222,7 +224,39 @@ def village_page():
                     if len(name_list) != character_count:
                         validation_errors.append(f"등장인물 수({character_count}명)와 입력한 이름 개수({len(name_list)}명)가 일치하지 않습니다.")
                 
-                # 3. 공연시간과 장면 수 비율 확인 (5분당 1장면 이상이면 경고)
+                # 3. 쉼표로 구분된 항목들의 내용 길이 확인
+                if character_names.strip() != "":
+                    name_list = [name.strip() for name in character_names.split(',') if name.strip()]
+                    for i, name in enumerate(name_list):
+                        if len(name) < 2:
+                            validation_errors.append(f"등장인물 {i+1}번째 이름이 너무 짧습니다.")
+                
+                if genre.strip() != "":
+                    genre_list = [g.strip() for g in genre.split(',') if g.strip()]
+                    for i, g in enumerate(genre_list):
+                        if len(g) < 2:
+                            validation_errors.append(f"연극 장르 {i+1}번째 항목이 너무 짧습니다.")
+                
+                if time_background.strip() != "":
+                    time_list = [t.strip() for t in time_background.split(',') if t.strip()]
+                    for i, t in enumerate(time_list):
+                        if len(t) < 2:
+                            validation_errors.append(f"시간적 배경 {i+1}번째 항목이 너무 짧습니다.")
+                
+                if space_background.strip() != "":
+                    space_list = [s.strip() for s in space_background.split(',') if s.strip()]
+                    for i, s in enumerate(space_list):
+                        if len(s) < 2:
+                            validation_errors.append(f"공간적 배경 {i+1}번째 항목이 너무 짧습니다.")
+                
+                # 4. 주제와 이야기 흐름 길이 확인
+                if theme.strip() != "" and len(theme.strip()) < 5:
+                    validation_errors.append("연극 주제가 너무 짧습니다. 더 자세히 작성해 주세요.")
+                
+                if story_flow.strip() != "" and len(story_flow.strip()) < 10:
+                    validation_errors.append("이야기 흐름이 너무 짧습니다. 더 자세히 작성해 주세요.")
+                
+                # 5. 공연시간과 장면 수 비율 확인 (5분당 1장면 이상이면 경고)
                 max_recommended_scenes = performance_time // 5
                 if scene_count > max_recommended_scenes:
                     validation_errors.append(f"공연시간 {performance_time}분에 비해 장면 수({scene_count}개)가 많습니다. 권장 장면 수는 {max_recommended_scenes}개 이하입니다.")
@@ -333,8 +367,6 @@ def village_page():
                 mime="text/plain",
                 key="download_file"
             )
-            # 다운로드 버튼 클릭 후 상태 초기화
-            st.session_state.download_settings = False
     
     with col2:
         # 업로드 완료되지 않은 경우에만 파일 업로더 표시

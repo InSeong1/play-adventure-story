@@ -1,5 +1,5 @@
 import streamlit as st
-from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario
+from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
 import os
 
 def feedback_page():
@@ -7,7 +7,8 @@ def feedback_page():
     # 페이지 상단으로 스크롤 (streamlit.components.v1 사용)
     import streamlit.components.v1 as components
     
-    
+    # BGM 재생
+    play_bgm("2. 이야기 숲.mp3")
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -226,20 +227,32 @@ def feedback_page():
             # 모든 장면의 무대와 대본이 입력되었는지 확인
             all_inputs_filled = True
             missing_inputs = []
+            validation_errors = []
             
             for scene_num in range(1, inputs['scene_count'] + 1):
                 stage_key = f"stage_{scene_num}"
                 script_key = f"script_{scene_num}"
                 
-                if not st.session_state.scene_inputs.get(stage_key, "").strip():
+                stage_content = st.session_state.scene_inputs.get(stage_key, "").strip()
+                script_content = st.session_state.scene_inputs.get(script_key, "").strip()
+                
+                # 무대 설정 확인
+                if not stage_content:
                     all_inputs_filled = False
                     missing_inputs.append(f"장면 {scene_num} 무대")
+                elif len(stage_content) < 3:
+                    all_inputs_filled = False
+                    validation_errors.append(f"장면 {scene_num} 무대 설정이 너무 짧습니다.")
                 
-                if not st.session_state.scene_inputs.get(script_key, "").strip():
+                # 대본 내용 확인
+                if not script_content:
                     all_inputs_filled = False
                     missing_inputs.append(f"장면 {scene_num} 대본")
+                elif len(script_content) < 20:
+                    all_inputs_filled = False
+                    validation_errors.append(f"장면 {scene_num} 대본 내용이 너무 짧습니다.")
             
-            if all_inputs_filled:
+            if all_inputs_filled and not validation_errors:
                 if st.button("🤖 AI 피드백 받기", key="get_feedback", 
                             help="AI가 현재 시나리오에 대한 피드백을 제공합니다",
                             use_container_width=True):
@@ -306,22 +319,57 @@ def feedback_page():
                         st.error(f"프롬프트 파일을 불러올 수 없습니다: {str(e)}")
             else:
                 # 경고 메시지 표시
-                st.warning("⚠️ 모든 장면의 무대와 대본을 입력해 주세요!")
-                st.info(f"아직 입력되지 않은 항목: {', '.join(missing_inputs)}")
+                if missing_inputs:
+                    st.warning("⚠️ 모든 장면의 무대와 대본을 입력해 주세요!")
+                    st.info(f"아직 입력되지 않은 항목: {', '.join(missing_inputs)}")
+                
+                if validation_errors:
+                    st.error("⚠️ 입력 내용을 더 자세히 작성해 주세요:")
+                    for error in validation_errors:
+                        st.write(f"• {error}")
                 
                 # 비활성화된 AI 피드백 버튼
                 st.button("🤖 AI 피드백 받기", key="get_feedback_disabled", 
-                         help="모든 장면의 무대와 대본을 입력해야 합니다",
+                         help="모든 장면의 무대와 대본을 충분히 입력해야 합니다",
                          use_container_width=True, disabled=True)
         
         # 생성된 피드백 표시
         if 'generated_feedback' in st.session_state:
             st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("### 💬 AI 피드백 (👍표시는 잘한점, ✏ 표시는 고쳐야할 점 입니다.)")
+            st.markdown("### 💬 AI 피드백")
+            st.markdown("**👍 표시는 잘한점, ✏ 표시는 고쳐야할 점 입니다.**")
             st.markdown("---")
             
-            # AI 응답의 줄바꿈 한 개를 줄바꿈 두 개로 변환하여 마크다운에서 제대로 줄 구분되도록 함
-            formatted_feedback = st.session_state.generated_feedback.replace('\n', '\n\n')
+            # AI 응답을 더 보기 좋게 포맷팅
+            feedback_text = st.session_state.generated_feedback
+            
+            # 질문 부분을 헤더로 변환
+            import re
+            
+            # 더 정확한 질문 패턴 찾기 (줄의 시작에서 시작하는 질문만)
+            lines = feedback_text.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                line = line.strip()
+                # 줄의 시작이 질문인지 확인 (한글 + 물음표로 끝나는 문장)
+                if line and line.endswith('?') and len(line) > 10:
+                    # 질문을 헤더로 변환
+                    formatted_lines.append(f"## {line}")
+                elif line.startswith("총평:"):
+                    # 총평 부분을 헤더로 변환하고 나머지 내용도 포함
+                    remaining_content = line[3:].strip()  # "총평:" 제거
+                    if remaining_content:
+                        formatted_lines.append(f"## 총평")
+                        formatted_lines.append(remaining_content)
+                    else:
+                        formatted_lines.append(f"## 총평")
+                else:
+                    formatted_lines.append(line)
+            
+            formatted_feedback = '\n'.join(formatted_lines)
+            
+            # 마크다운으로 표시
             st.markdown(formatted_feedback)
             
             # 피드백을 바탕으로 대본 수정 안내
@@ -331,7 +379,7 @@ def feedback_page():
             <div style="text-align: center; padding: 1rem; background-color: #f0f8ff; border-radius: 10px; margin: 1rem 0;">
                 <h4 style="color: #2E86AB; margin-bottom: 0.5rem;">📝 대본 수정 안내</h4>
                 <p style="color: #666; margin: 0;">
-                    위의 AI 피드백을 바탕으로 <a href="#장면별-대본-작성" style="color: #2E86AB; text-decoration: none; font-weight: bold; cursor: pointer;">장면별 대본 작성</a> 섹션에서 대본을 수정해 보세요.<br>
+                    위의 AI 피드백을 바탕으로 <a href="#장면별-대본-작성" style="color: #2E86AB; text-decoration: none; font-weight: bold; cursor: pointer;">🎭 장면별 대본 작성</a> 에서 대본을 수정해 보세요.<br>
                     수정 후 다시 AI 피드백을 받을 수 있습니다.
                 </p>
             </div>

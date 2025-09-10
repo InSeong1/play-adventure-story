@@ -299,6 +299,7 @@ def summary_page():
         <h4 style="color: #2E86AB; margin-bottom: 1rem;">💡 PDF 저장 팁</h4>
         <p style="margin-bottom: 0.5rem; color: #333;"><strong>위의 버튼을 클릭하거나</strong> <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Ctrl</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Windows/Linux) 또는 <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Mac)을 눌러주세요!</p>
         <p style="margin-bottom: 0; color: #333;"><strong>인쇄 창에서:</strong> 대상을 "PDF로 저장"으로 변경하고, "배경 그래픽" 옵션을 체크하면 색상과 이미지가 포함된 완벽한 PDF를 만들 수 있습니다.</p>
+        <p style="margin-bottom: 0; color: #333;">왼쪽 메뉴 바를 닫고 저장을 시도해서 pdf 파일로 증서를 얻어볼까요?</p>
     </div>
     """, unsafe_allow_html=True)
     

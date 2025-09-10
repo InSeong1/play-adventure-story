@@ -1,13 +1,13 @@
 import streamlit as st
-from utils import get_file_path, get_base64_image, render_common_menu
+from utils import get_file_path, get_base64_image, render_common_menu, play_bgm
 import os
 import openai
 
 def memory_page():
     """추억의 언덕 페이지"""
     
-    
-    
+    # BGM 재생
+    play_bgm("5. 추억의 언덕.mp3")
     
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
@@ -81,9 +81,9 @@ def memory_page():
     # 패들렛 링크 버튼
     st.markdown("""
     <div style="text-align: center; margin: 2rem 0;">
-        <h3 style="color: #2E86AB; margin-bottom: 1rem;">📝 추가 활동</h3>
+        <h3 style="color: #2E86AB; margin-bottom: 1rem;">📝 참고 사진</h3>
         <p style="color: #666; margin-bottom: 2rem;">
-            연극 활동을 더 풍부하게 만들어보세요!
+            패들렛을 통해 여러분들의 연극 준비 및 실천 과정을 되돌아보고 질문에 답해보도록 합시다.
         </p>
     </div>
     """, unsafe_allow_html=True)
