@@ -13,26 +13,26 @@ def summary_page():
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
-    # 인쇄 버튼 (페이지 상단)
-    st.markdown("""
-    <div style="text-align: center; margin-bottom: 2rem;">
-        <button onclick="window.print()" style="
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" 
-           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
-            완주 증서
-        </button>
-    </div>
-    """, unsafe_allow_html=True)
+    # # 인쇄 버튼 (페이지 상단)
+    # st.markdown("""
+    # <div style="text-align: center; margin-bottom: 2rem;">
+    #     <button onclick="window.print()" style="
+    #         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    #         color: white;
+    #         border: none;
+    #         padding: 12px 24px;
+    #         border-radius: 25px;
+    #         font-size: 16px;
+    #         font-weight: bold;
+    #         cursor: pointer;
+    #         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    #         transition: all 0.3s ease;
+    #     " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.6)'" 
+    #        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
+    #         완주 증서
+    #     </button>
+    # </div>
+    # """, unsafe_allow_html=True)
     
     # 메인 콘텐츠를 감싸는 컨테이너
     st.markdown('<div class="main-content" id="summary-page-top">', unsafe_allow_html=True)
@@ -42,7 +42,8 @@ def summary_page():
     <div style="text-align: center; padding: 2rem;">
         <h1 style="color: #2E86AB; font-weight: bold; margin-bottom: 2rem;">🏆 연극 대모험 완주 축하합니다!</h1>
         <p style="color: #666; font-size: 1.2rem; margin-bottom: 3rem;">
-            연극 대모험 여정을 돌아보는 시간입니다.
+            연극 대모험 여정을 돌아보는 시간입니다.<br>
+            스크롤을 아래로 내리면서 연극 대모험의 여정을 돌아보아요! <br>
         </p>
     </div>
     """, unsafe_allow_html=True)

@@ -700,6 +700,12 @@ def get_base64_image(file_path):
         st.error(f"이미지 로딩 오류: {str(e)}")
         return None
 
+def dialog_dismiss_callback():
+    """Universal dialog dismiss callback that scrolls to top"""
+    # Set flag to trigger scroll after rerun
+    st.session_state.dialog_dismissed = True
+    st.session_state.scroll_to_top_after_dialog = True
+
 def render_badge_board():
     """Function to render the badge board on the right side"""
     # Current number of cleared villages (get from session state or default to 0)
@@ -814,7 +820,7 @@ def render_badge_board():
         # Clear the container when hidden
         badge_container.container().empty()
 
-@st.dialog("🗺️ 연극 대모험 지도", width="large")
+@st.dialog("🗺️ 연극 대모험 지도", width="large", on_dismiss=dialog_dismiss_callback)
 def show_map_dialog():
     """지도 다이얼로그"""
     # 전체지도.png 이미지 로드
@@ -826,12 +832,37 @@ def show_map_dialog():
     else:
         st.error("지도 이미지를 불러올 수 없습니다.")
 
-@st.dialog("알림", width="medium")
+def village_dialog_callback():
+    """village_page dialog dismiss callback"""
+    dialog_dismiss_callback()
+    if st.session_state.get('current_page') == 'village':
+        st.session_state.dialog_dismissed = True
+
+@st.dialog("알림", width="medium", on_dismiss=village_dialog_callback)
 def show_arrival_dialog(message: str = ""):
     if message:
         st.markdown(message)
 
-@st.dialog("🏆 뱃지 획득", width="large")
+@st.dialog("🌟 모험의 시작", width="medium", on_dismiss=dialog_dismiss_callback)
+def show_adventure_start_dialog():
+    """모험 시작 다이얼로그"""
+    st.markdown("""
+    <div style='text-align: center; padding: 20px;'>
+        <h3 style='color: #4ECDC4; margin-bottom: 20px;'>🎭 연극 대모험에 오신 것을 환영해요!</h3>
+        <p style='font-size: 1.1rem; line-height: 1.6; color: #333; margin-bottom: 15px;'>
+            이제 정말 신나는 모험이 시작돼요! 🚀
+        </p>
+        <p style='font-size: 1rem; line-height: 1.6; color: #666;'>
+            지도에서 원하는 마을을 선택해서<br>
+            멋진 연극 이야기를 만들어보세요! ✨
+        </p>
+        <p style='font-size: 0.9rem; color: #888; margin-top: 20px;'>
+            준비되셨나요? 그럼 함께 떠나요! 🌟
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+@st.dialog("🏆 뱃지 획득", width="large", on_dismiss=village_dialog_callback)
 def show_badge_dialog(image_filename: str = ""):
     if not image_filename:
         return
@@ -858,7 +889,8 @@ def scroll_to_top():
     # 현재 페이지에 따라 적절한 div ID 선택
     current_page = st.session_state.get('current_page', 'intro')
     page_div_ids = {
-        'village': 'village-page-top',
+        'adventure_map': 'adventure-map-top',
+        'village': 'village-audio-top',
         'story_forest': 'feedback-page-top',  # feedback_page의 div ID
         'feedback_page': 'feedback-page-top',
         'prepare_page': 'prepare-page-top',
@@ -872,16 +904,32 @@ def scroll_to_top():
     if target_div_id:
         components.html(f"""
         <script>
-            // 특정 div로 스크롤
-            setTimeout(function() {{
+            // 여러 방법으로 스크롤을 맨 위로 이동
+            function scrollToTop() {{
+                // 1. 먼저 기본 스크롤
+                window.parent.scrollTo(0, 0);
+                
+                // 2. 특정 div로 스크롤 시도
                 var element = window.parent.document.getElementById('{target_div_id}');
                 if (element) {{
                     element.scrollIntoView({{behavior: 'smooth', block: 'start'}});
-                }} else {{
-                    // fallback: 페이지 상단으로 스크롤
-                    window.parent.scrollTo(0, 0);
                 }}
-            }}, 100);
+                
+                // 3. 강제로 상단으로 이동
+                setTimeout(function() {{
+                    window.parent.scrollTo(0, 0);
+                    // 추가 보장
+                    window.parent.document.documentElement.scrollTop = 0;
+                    window.parent.document.body.scrollTop = 0;
+                }}, 50);
+            }}
+            
+            // 즉시 실행
+            scrollToTop();
+            
+            // DOM 로드 후에도 실행
+            setTimeout(scrollToTop, 100);
+            setTimeout(scrollToTop, 300);
         </script>
         """, height=0)
     else:
@@ -889,14 +937,27 @@ def scroll_to_top():
         components.html("""
         <script>
             // 여러 방법으로 스크롤을 맨 위로 이동
-            window.parent.scrollTo(0, 0);
-            window.parent.scrollTo(0, -1000);
+            function scrollToTop() {
+                window.parent.scrollTo(0, 0);
+                window.parent.document.documentElement.scrollTop = 0;
+                window.parent.document.body.scrollTop = 0;
+                
+                // iframe 내부 스크롤도 처리
+                var iframes = window.parent.document.querySelectorAll('iframe');
+                iframes.forEach(function(iframe) {
+                    try {
+                        iframe.contentWindow.scrollTo(0, 0);
+                    } catch(e) {}
+                });
+            }
+            
+            // 즉시 실행
+            scrollToTop();
             
             // DOM이 로드된 후에도 실행
-            setTimeout(function() {
-                window.parent.scrollTo(0, 0);
-                window.parent.scrollTo(0, -1000);
-            }, 100);
+            setTimeout(scrollToTop, 100);
+            setTimeout(scrollToTop, 300);
+            setTimeout(scrollToTop, 500);
         </script>
         """, height=0)
 
@@ -919,11 +980,9 @@ def render_map_popup():
         show_map_dialog()
         # 다이얼로그가 닫히면 상태 초기화
         st.session_state.show_map_popup = False
-        # 팝업 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
             
 
-@st.dialog("📖 사용 방법", width="large")
+@st.dialog("📖 사용 방법", width="large", on_dismiss=dialog_dismiss_callback)
 def show_help_dialog():
     """사용 방법 다이얼로그"""
     # 사용 방법.png 이미지 로드
@@ -942,11 +1001,9 @@ def render_help_popup():
         show_help_dialog()
         # 다이얼로그가 닫히면 상태 초기화
         st.session_state.show_help_popup = False
-        # 팝업 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
             
 
-@st.dialog("❓ 자주하는 질문", width="large")
+@st.dialog("❓ 자주하는 질문", width="large", on_dismiss=dialog_dismiss_callback)
 def show_faq_dialog():
     """자주하는 질문 다이얼로그"""
     # 자주하는 질문.png 이미지 로드
@@ -965,11 +1022,9 @@ def render_faq_popup():
         show_faq_dialog()
         # 다이얼로그가 닫히면 상태 초기화
         st.session_state.show_faq_popup = False
-        # 팝업 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
             
 
-@st.dialog("📝 극본의 특성", width="large")
+@st.dialog("📝 극본의 특성", width="large", on_dismiss=dialog_dismiss_callback)
 def show_script_dialog():
     """극본의 특성 다이얼로그"""
     # 극본의 특성.png 이미지 로드
@@ -988,11 +1043,9 @@ def render_script_popup():
         show_script_dialog()
         # 다이얼로그가 닫히면 상태 초기화
         st.session_state.show_script_popup = False
-        # 팝업 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
             
 
-@st.dialog("🎭 연극의 특성", width="large")
+@st.dialog("🎭 연극의 특성", width="large", on_dismiss=dialog_dismiss_callback)
 def show_theater_dialog():
     """연극의 특성 다이얼로그"""
     # 연극의 특성.png 이미지 로드
@@ -1011,8 +1064,6 @@ def render_theater_popup():
         show_theater_dialog()
         # 다이얼로그가 닫히면 상태 초기화
         st.session_state.show_theater_popup = False
-        # 팝업 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
             
 
     
@@ -1052,6 +1103,10 @@ def main():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "intro"
     
+    # Check if dialog was dismissed and scroll to top
+    if st.session_state.get('scroll_to_top_after_dialog', False):
+        scroll_to_top()
+        st.session_state.scroll_to_top_after_dialog = False
     
     # Render map popup if needed (displayed on all pages)
     render_map_popup()
@@ -1073,8 +1128,11 @@ def main():
     if st.session_state.get('show_badge_dialog', False):
         show_badge_dialog(st.session_state.get('badge_image_filename', ''))
         st.session_state.show_badge_dialog = False
-        # 뱃지 다이얼로그 닫힌 후 스크롤을 맨 위로
-        scroll_to_top()
+
+    # Show adventure start dialog if transitioning to adventure_map
+    if st.session_state.get('show_adventure_start_dialog', False):
+        show_adventure_start_dialog()
+        st.session_state.show_adventure_start_dialog = False
 
     if st.session_state.current_page == "intro":
         intro_page()
@@ -1086,7 +1144,7 @@ def main():
             st.session_state.show_village_dialog = False
         village_page()
     elif st.session_state.current_page == "story_forest":
-        story_forest_page()
+        feedback_page()
     elif st.session_state.current_page == "feedback_page":
         if st.session_state.get('show_feedback_dialog'):
             show_arrival_dialog(st.session_state.get('feedback_dialog_message', ''))

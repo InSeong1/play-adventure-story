@@ -4,75 +4,56 @@ import os
 
 def feedback_page():
     """피드백 페이지 (이야기 숲)"""
-    # 페이지 상단으로 스크롤 (streamlit.components.v1 사용)
-    import streamlit.components.v1 as components
-    
-    # BGM 재생
-    play_bgm("2. 이야기 숲.mp3")
-    
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
-    # 초대장 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
+    # 페이지 상단으로 스크롤 (dialog 닫힐 때 커서가 여기로 오도록)
+    st.markdown('<div id="feedback-page-top"></div>', unsafe_allow_html=True)
+    
+    # 초대장 이미지 표시
     invitation_path = get_file_path("사진 모음/초대장/2_이야기 숲 초대장.png")
     invitation_image = get_base64_image(invitation_path)
     
     if invitation_image:
-        # 이미지를 CSS 클래스를 사용하여 적절한 크기로 표시
-        st.markdown(f"""
-        <div id="초대장-이미지" class="image-container">
-            <img src="data:image/png;base64,{invitation_image}" alt="이야기 숲 초대장">
-        </div>
-        """, unsafe_allow_html=True)
+        # 오디오 플레이어들을 배치
+        col1, col2, col3 = st.columns([1, 5, 1])
+        
+        # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
+        with col1:
+            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            try:
+                with open(get_file_path("브금 모음/2. 이야기 숲.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 초대장 듣기 (마지막 컬럼)
+        with col3:
+            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            try:
+                with open(get_file_path("나레이션 소리 모음/2.이야기 숲.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 공백 추가
+        st.markdown("")
+        st.markdown("")
+        st.image(f"data:image/png;base64,{invitation_image}", width="stretch")
     else:
         st.error("초대장 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
-    
-    # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation_feedback_page", 
-                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
-                    use_container_width=True):
-            st.session_state["show_narration_feedback_page"] = not st.session_state.get("show_narration_feedback_page", False)
-            st.rerun()
-    
-    # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration_feedback_page', False):
-        st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("**🎧 초대장 듣기**")
-            # 나레이션 오디오 파일 재생 (BGM과 함께)
-            try:
-                with open(get_file_path("나레이션 소리 모음/2.이야기 숲.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
-                
-                # 나레이션 텍스트 내용 출력
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**📖 나레이션 내용:**")
-                try:
-                    with open(get_file_path("나레이션/2.이야기 숲.txt"), "r", encoding="utf-8") as text_file:
-                        narration_text = text_file.read()
-                        st.write(narration_text)
-                except Exception as e:
-                    st.error(f"나레이션 텍스트 파일을 불러올 수 없습니다: {str(e)}")
-                
-            except Exception as e:
-                st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
-                st.write(f"파일 경로: 나레이션 소리 모음/2.이야기 숲.mp3")
 
     
     # 입력 폼 제목
     st.markdown("""
     <div style="text-align: center; padding: 2rem;">
         <h2 style="color: #2E86AB; font-weight: bold; margin-bottom: 1rem;">✏️ 극본 작성하기</h2>
-        <p style="color: #666; font-size: 1.1rem;">이전 마을에서 입력한 정보를 확인하고 대본을 작성해 보아요. <br>왼쪽 메뉴에서 극본의 구성 요소를 확인해 보아요.</p>
+        <p style="color: #666; font-size: 1.1rem;">이전 마을에서 입력한 정보를 확인하고 대본을 작성해 보아요. <br>왼쪽 메뉴 혹은 아래 그림에서 극본의 구성 요소를 확인해 보아요.</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -82,13 +63,7 @@ def feedback_page():
     
     if script_characteristics_image:
         st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown(f"""
-            <div class="image-container">
-                <img src="data:image/png;base64,{script_characteristics_image}" alt="극본의 특성" style="max-width: 100%; height: auto;">
-            </div>
-            """, unsafe_allow_html=True)
+        st.image(f"data:image/png;base64,{script_characteristics_image}", width="stretch")
     else:
         st.error("극본의 특성 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {script_characteristics_path}")
@@ -240,7 +215,7 @@ def feedback_page():
                 if not stage_content:
                     all_inputs_filled = False
                     missing_inputs.append(f"장면 {scene_num} 무대")
-                elif len(stage_content) < 3:
+                elif len(stage_content) < 2:
                     all_inputs_filled = False
                     validation_errors.append(f"장면 {scene_num} 무대 설정이 너무 짧습니다.")
                 
@@ -248,7 +223,7 @@ def feedback_page():
                 if not script_content:
                     all_inputs_filled = False
                     missing_inputs.append(f"장면 {scene_num} 대본")
-                elif len(script_content) < 20:
+                elif len(script_content) < 15:
                     all_inputs_filled = False
                     validation_errors.append(f"장면 {scene_num} 대본 내용이 너무 짧습니다.")
             
@@ -354,23 +329,23 @@ def feedback_page():
                 line = line.strip()
                 # 줄의 시작이 질문인지 확인 (한글 + 물음표로 끝나는 문장)
                 if line and line.endswith('?') and len(line) > 10:
-                    # 질문을 헤더로 변환
-                    formatted_lines.append(f"## {line}")
+                    # 질문을 HTML 헤더로 변환 (일관된 크기, 기본 색상 유지)
+                    formatted_lines.append(f"<h4 style='margin: 1rem 0 0.5rem 0; font-size: 1.2rem;'>{line}</h4>")
                 elif line.startswith("총평:"):
                     # 총평 부분을 헤더로 변환하고 나머지 내용도 포함
                     remaining_content = line[3:].strip()  # "총평:" 제거
                     if remaining_content:
-                        formatted_lines.append(f"## 총평")
-                        formatted_lines.append(remaining_content)
+                        formatted_lines.append(f"<h3 style='margin: 1.5rem 0 1rem 0; font-size: 1.4rem;'>총평</h3>")
+                        formatted_lines.append(f"<p style='margin: 0.5rem 0;'>{remaining_content}</p>")
                     else:
-                        formatted_lines.append(f"## 총평")
+                        formatted_lines.append(f"<h3 style='margin: 1.5rem 0 1rem 0; font-size: 1.4rem;'>총평</h3>")
                 else:
                     formatted_lines.append(line)
             
             formatted_feedback = '\n'.join(formatted_lines)
             
-            # 마크다운으로 표시
-            st.markdown(formatted_feedback)
+            # HTML로 표시 (헤딩 크기 일관성 보장)
+            st.markdown(formatted_feedback, unsafe_allow_html=True)
             
             # 피드백을 바탕으로 대본 수정 안내
             st.markdown("<br>", unsafe_allow_html=True)

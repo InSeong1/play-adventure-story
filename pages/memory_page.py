@@ -5,66 +5,49 @@ import openai
 
 def memory_page():
     """추억의 언덕 페이지"""
-    
-    # BGM 재생
-    play_bgm("5. 추억의 언덕.mp3")
-    
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
-    st.markdown('<div class="main-content" id="memory-page-top">', unsafe_allow_html=True)
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
-    # 초대장 이미지를 적절한 크기로 표시
+    # 페이지 상단으로 스크롤 (dialog 닫힐 때 커서가 여기로 오도록)
+    st.markdown('<div id="memory-page-top"></div>', unsafe_allow_html=True)
+    
+    # 초대장 이미지 표시
     invitation_path = get_file_path("사진 모음/초대장/5_추억의 언덕 초대장.png")
     invitation_image = get_base64_image(invitation_path)
     
     if invitation_image:
-        # 이미지를 CSS 클래스를 사용하여 적절한 크기로 표시
-        st.markdown(f"""
-        <div class="image-container">
-            <img src="data:image/png;base64,{invitation_image}" alt="추억의 언덕 초대장">
-        </div>
-        """, unsafe_allow_html=True)
+        # 오디오 플레이어들을 배치
+        col1, col2, col3 = st.columns([1, 5, 1])
+        
+        # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
+        with col1:
+            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            try:
+                with open(get_file_path("브금 모음/5. 추억의 언덕.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 초대장 듣기 (마지막 컬럼)
+        with col3:
+            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            try:
+                with open(get_file_path("나레이션 소리 모음/5.추억의 언덕.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 공백 추가
+        st.markdown("")
+        st.markdown("")
+        st.image(f"data:image/png;base64,{invitation_image}", width="stretch")
     else:
         st.error("초대장 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
-    
-    # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation_memory", 
-                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
-                    use_container_width=True):
-            st.session_state["show_narration_memory"] = not st.session_state.get("show_narration_memory", False)
-            st.rerun()
-    
-    # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration_memory', False):
-        st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("**🎧 초대장 듣기**")
-            # 나레이션 오디오 파일 재생 (BGM과 함께)
-            try:
-                with open(get_file_path("나레이션 소리 모음/5.추억의 언덕.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
-                
-                # 나레이션 텍스트 내용 출력
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**📖 초대장 듣기:**")
-                try:
-                    with open(get_file_path("나레이션/5.추억의 언덕.txt"), "r", encoding="utf-8") as text_file:
-                        narration_text = text_file.read()
-                        st.write(narration_text)
-                except Exception as e:
-                    st.error(f"나레이션 텍스트 파일을 불러올 수 없습니다: {str(e)}")
-                
-            except Exception as e:
-                st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
-                st.write(f"파일 경로: 나레이션 소리 모음/5. 추억의 언덕.mp3")
     
     # 추억의 언덕 제목
     st.markdown("""
@@ -78,24 +61,7 @@ def memory_page():
     """, unsafe_allow_html=True)
 
     
-    # 패들렛 링크 버튼
-    st.markdown("""
-    <div style="text-align: center; margin: 2rem 0;">
-        <h3 style="color: #2E86AB; margin-bottom: 1rem;">📝 참고 사진</h3>
-        <p style="color: #666; margin-bottom: 2rem;">
-            패들렛을 통해 여러분들의 연극 준비 및 실천 과정을 되돌아보고 질문에 답해보도록 합시다.
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.link_button(
-            "📋 패들렛으로 이동",
-            "https://padlet.com/wlgusld1234/padlet-xg7qo5wsrk5v0rox",
-            help="패들렛에서 추가 활동을 진행하세요",
-            use_container_width=True
-        )
+
     
     
     # 질문 리스트
@@ -218,24 +184,3 @@ def memory_page():
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 페이지 상단으로 스크롤 (모든 콘텐츠 로드 후 실행)
-    import streamlit.components.v1 as components
-    
-    def scroll_to_top():
-        components.html("""
-        <script>
-            // 모든 콘텐츠가 로드된 후 스크롤 실행
-            setTimeout(function() {
-                window.parent.scrollTo(0, 0);
-                window.parent.scrollTo(0, -1000);
-            }, 1000);
-            
-            setTimeout(function() {
-                window.parent.scrollTo(0, 0);
-                window.parent.scrollTo(0, -1000);
-            }, 2000);
-        </script>
-        """, height=0)
-    
-    scroll_to_top()

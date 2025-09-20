@@ -4,66 +4,49 @@ import os
 
 def prepare_page():
     """준비의 광장 페이지"""
-    
-    
-    
-    
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
-    # 초대장 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
+    # 페이지 상단으로 스크롤 (dialog 닫힐 때 커서가 여기로 오도록)
+    st.markdown('<div id="prepare-page-top"></div>', unsafe_allow_html=True)
+    
+    # 초대장 이미지 표시
     invitation_path = get_file_path("사진 모음/초대장/3_준비의 광장 초대장.png")
     invitation_image = get_base64_image(invitation_path)
     
     if invitation_image:
-        # 이미지를 CSS 클래스를 사용하여 적절한 크기로 표시
-        st.markdown(f"""
-        <div class="image-container">
-            <img src="data:image/png;base64,{invitation_image}" alt="준비의 광장 초대장">
-        </div>
-        """, unsafe_allow_html=True)
+        # 오디오 플레이어들을 배치
+        col1, col2, col3 = st.columns([1, 5, 1])
+        
+        # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
+        with col1:
+            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            try:
+                with open(get_file_path("브금 모음/3. 준비의 광장.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 초대장 듣기 (마지막 컬럼)
+        with col3:
+            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            try:
+                with open(get_file_path("나레이션 소리 모음/3.준비의 광장.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 공백 추가
+        st.markdown("")
+        st.markdown("")
+        st.image(f"data:image/png;base64,{invitation_image}", width="stretch")
     else:
         st.error("초대장 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
-    
-    # 초대장 듣기 버튼과 나레이션 오디오 플레이어
-    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation_prepare", 
-                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
-                    use_container_width=True):
-            st.session_state["show_narration_prepare"] = not st.session_state.get("show_narration_prepare", False)
-            st.rerun()
-    
-    # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration_prepare', False):
-        st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("**🎧 초대장 듣기**")
-            # 나레이션 오디오 파일 재생 (BGM과 함께)
-            try:
-                with open(get_file_path("나레이션 소리 모음/3.준비의 광장.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
-                
-                # 나레이션 텍스트 내용 출력
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**📖 초대장 내용:**")
-                try:
-                    with open(get_file_path("나레이션/3.준비의 광장.txt"), "r", encoding="utf-8") as text_file:
-                        narration_text = text_file.read()
-                        st.write(narration_text)
-                except Exception as e:
-                    st.error(f"나레이션 텍스트 파일을 불러올 수 없습니다: {str(e)}")
-                
-            except Exception as e:
-                st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
-                st.write(f"파일 경로: 나레이션 소리 모음/3.준비의 광장.mp3")
     
     
     # 준비의 광장 제목
@@ -80,13 +63,7 @@ def prepare_page():
     
     if process_image:
         st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown(f"""
-            <div class="image-container">
-                <img src="data:image/png;base64,{process_image}" alt="연극 공연 연습의 과정" style="max-width: 100%; height: auto;">
-            </div>
-            """, unsafe_allow_html=True)
+        st.image(f"data:image/png;base64,{process_image}", width="stretch")
     else:
         st.error("연극 공연 연습의 과정 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {process_image_path}")
@@ -170,24 +147,24 @@ def prepare_page():
                 line = line.strip()
                 # 줄의 시작이 질문인지 확인 (한글 + 물음표로 끝나는 문장)
                 if line and line.endswith('?') and len(line) > 10:
-                    # 질문을 헤더로 변환
-                    formatted_lines.append(f"## {line}")
+                    # 질문을 HTML 헤더로 변환 (일관된 크기, 기본 색상 유지)
+                    formatted_lines.append(f"<h4 style='margin: 1rem 0 0.5rem 0; font-size: 1.2rem;'>{line}</h4>")
                 elif line.startswith("총평:"):
                     # 총평 부분을 헤더로 변환하고 나머지 내용도 포함
                     remaining_content = line[3:].strip()  # "총평:" 제거
                     if remaining_content:
-                        formatted_lines.append(f"## 총평")
-                        formatted_lines.append(remaining_content)
+                        formatted_lines.append(f"<h3 style='margin: 1.5rem 0 1rem 0; font-size: 1.4rem;'>총평</h3>")
+                        formatted_lines.append(f"<p style='margin: 0.5rem 0;'>{remaining_content}</p>")
                     else:
-                        formatted_lines.append(f"## 총평")
+                        formatted_lines.append(f"<h3 style='margin: 1.5rem 0 1rem 0; font-size: 1.4rem;'>총평</h3>")
                 else:
                     formatted_lines.append(line)
             
             formatted_feedback = '\n'.join(formatted_lines)
             final_script += f"{formatted_feedback}\n\n"
         
-        # 극본 내용 표시
-        st.markdown(final_script)
+        # 극본 내용 표시 (HTML 포맷팅 적용)
+        st.markdown(final_script, unsafe_allow_html=True)
         
         # 장면별 대본 미리보기 (선택사항)
         if scene_count > 0:
@@ -228,7 +205,14 @@ def prepare_page():
     
     # 체크리스트 섹션
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("### 📋 연극 준비 체크리스트")
+    
+    # 제목과 외부 링크 버튼을 2열로 배치
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.markdown("### 📋 연극 준비 체크리스트")
+    with col2:
+        st.link_button("🐉 대본 작성에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="연극 용과 함께 대본 작성을 시작해 볼까요?")
+    
     st.markdown("---")
     
     # 체크리스트 상태 초기화
@@ -328,24 +312,3 @@ def prepare_page():
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 페이지 상단으로 스크롤 (모든 콘텐츠 로드 후 실행)
-    import streamlit.components.v1 as components
-    
-    def scroll_to_top():
-        components.html("""
-        <script>
-            // 모든 콘텐츠가 로드된 후 스크롤 실행
-            setTimeout(function() {
-                window.parent.scrollTo(0, 0);
-                window.parent.scrollTo(0, -1000);
-            }, 1000);
-            
-            setTimeout(function() {
-                window.parent.scrollTo(0, 0);
-                window.parent.scrollTo(0, -1000);
-            }, 2000);
-        </script>
-        """, height=0)
-    
-    scroll_to_top()

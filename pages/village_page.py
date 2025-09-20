@@ -1,70 +1,69 @@
 import streamlit as st
 from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
 import os
+import time
 
 def village_page():
     """시작의 마을 페이지 (확장 가능한 구조)"""
-    
-    # BGM 재생
-    play_bgm("1. 시작의 마을.mp3")
-    
     # 햄버거 메뉴 (사이드바)
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
-    st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
-    # 초대장 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
+    st.markdown('<div class="main-content">', unsafe_allow_html=True)
+    # 배경음악 버튼을 가장 먼저 렌더링 (dialog 닫힐 때 커서가 여기로 오도록)
+    st.markdown('<div id="village-audio-top"></div>', unsafe_allow_html=True)
+    
+    
+    # 초대장 이미지 표시
     invitation_path = get_file_path("사진 모음/초대장/1_시작의 마을 초대장.png")
-
     invitation_image = get_base64_image(invitation_path)
     
     if invitation_image:
-        # 이미지를 CSS 클래스를 사용하여 적절한 크기로 표시
-        st.markdown(f"""
-        <div class="image-container">
-            <img src="data:image/png;base64,{invitation_image}" alt="시작의 마을 초대장">
-        </div>
-        """, unsafe_allow_html=True)
+        # 오디오 플레이어들을 배치
+        col1, col2, col3 = st.columns([1, 5, 1])
+        
+        # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
+        with col1:
+            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            try:
+                with open(get_file_path("브금 모음/1. 시작의 마을.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
+        
+        
+        # 초대장 듣기 (마지막 컬럼)
+        with col3:
+            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            try:
+                with open(get_file_path("나레이션 소리 모음/1.시작의 마을.mp3"), "rb") as audio_file:
+                    st.audio(audio_file.read(), format="audio/mp3")
+            except Exception as e:
+                st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
+        
+        # 공백 추가
+        st.markdown("")
+        st.markdown("")
+        st.image(f"data:image/png;base64,{invitation_image}",width="stretch")
     else:
         st.error("초대장 이미지를 불러올 수 없습니다.")
         st.write(f"파일 경로: {invitation_path}")
         st.write(f"파일 존재 여부: {os.path.exists(invitation_path)}")
     
-
-    st.markdown('<div id="초대장-듣기-버튼"></div>', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📜 초대장 듣기", key="listen_invitation_village", 
-                    help="클릭하여 초대장 나레이션을 보이기/숨기기",
-                    use_container_width=True):
-            st.session_state["show_narration_village"] = not st.session_state.get("show_narration_village", False)
-            st.rerun()
-    
-    # 나레이션 오디오 플레이어 (버튼 클릭 시 표시)
-    if st.session_state.get('show_narration_village', False):
-        st.markdown("<br>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
-            st.markdown("**🎧 초대장 듣기**")
-            # 나레이션 오디오 파일 재생 (BGM과 함께)
-            try:
-                with open(get_file_path("나레이션 소리 모음/1.시작의 마을.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
-                
-                # 나레이션 텍스트 내용 출력
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**📖 초대장 내용:**")
-                try:
-                    with open(get_file_path("나레이션/1.시작의 마을.txt"), "r", encoding="utf-8") as text_file:
-                        narration_text = text_file.read()
-                        st.write(narration_text)
-                except Exception as e:
-                    st.error(f"나레이션 텍스트 파일을 불러올 수 없습니다: {str(e)}")
-                
-            except Exception as e:
-                st.error(f"나레이션 파일을 불러올 수 없습니다: {str(e)}")
-                st.write(f"파일 경로: 나레이션 소리 모음/1.시작의 마을.mp3")
+    # 초대장 내용 컨테이너화
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background: rgba(255, 255, 255, 0.9); padding: 20px; border-radius: 15px; 
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin: 20px 0;">
+        <h3 style="text-align: center; color: #333; margin-bottom: 15px;">📜 시작의 마을 초대장</h3>
+        <p style="font-size: 1.1rem; line-height: 1.6; color: #555; text-align: center;">
+            안녕하세요~ 시작의 마을에 오신 여러분을 환영합니다!<br><br>
+            시작의 마을에서는 여러분들이 모둠 회의를 통해 대본에 필요한 여러 가지 항목들을 함께 정하고 기록할 것입니다.<br><br>
+            그럼 시작해볼까요? 무대를 설계해 봅시다! 참! <strong>잔인한 내용이나 욕설 사용은 절대 금지입니다^^</strong>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
 
     
