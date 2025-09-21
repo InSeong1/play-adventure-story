@@ -298,9 +298,21 @@ def summary_page():
     st.markdown("""
     <div style="background: #e3f2fd; padding: 1.5rem; border-radius: 15px; border-left: 4px solid #2E86AB; margin: 2rem 0;">
         <h4 style="color: #2E86AB; margin-bottom: 1rem;">💡 PDF 저장 팁</h4>
-        <p style="margin-bottom: 0.5rem; color: #333;"><strong>위의 버튼을 클릭하거나</strong> <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Ctrl</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Windows/Linux) 또는 <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Mac)을 눌러주세요!</p>
-        <p style="margin-bottom: 0; color: #333;"><strong>인쇄 창에서:</strong> 대상을 "PDF로 저장"으로 변경하고, "배경 그래픽" 옵션을 체크하면 색상과 이미지가 포함된 완벽한 PDF를 만들 수 있습니다.</p>
-        <p style="margin-bottom: 0; color: #333;">왼쪽 메뉴 바를 닫고 저장을 시도해서 pdf 파일로 증서를 얻어볼까요?</p>
+        
+        <div style="margin-bottom: 1rem;">
+            <h5 style="color: #1976D2; margin-bottom: 0.5rem;">🖥️ PC에서:</h5>
+            <p style="margin-bottom: 0.5rem; color: #333;"><strong>위의 버튼을 클릭하거나</strong> <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Ctrl</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Windows/Linux) 또는 <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> (Mac)을 눌러주세요!</p>
+            <p style="margin-bottom: 0; color: #333;"><strong>인쇄 창에서:</strong> 대상을 "PDF로 저장"으로 변경하고, "배경 그래픽" 옵션을 체크하면 색상과 이미지가 포함된 완벽한 PDF를 만들 수 있습니다.</p>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <h5 style="color: #1976D2; margin-bottom: 0.5rem;">📱 태블릿에서:</h5>
+            <p style="margin-bottom: 0.5rem; color: #333;"><strong>iPad:</strong> 화면을 길게 누르고 "공유" → "PDF로 저장" 또는 Safari에서 <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">Cmd</kbd> + <kbd style="background: #f0f0f0; color: #333; padding: 2px 6px; border-radius: 3px;">P</kbd> → "PDF로 저장"</p>
+            <p style="margin-bottom: 0.5rem; color: #333;"><strong>Android 태블릿:</strong> Chrome에서 ⋮ 메뉴 → "공유" → "인쇄" → "PDF로 저장" 또는 화면 캡처 후 "PDF로 변환" 앱 사용</p>
+            <p style="margin-bottom: 0; color: #333;"><strong>공통:</strong> 브라우저 설정에서 "데스크톱 모드"로 전환하면 PC와 동일한 방법으로 PDF 저장이 가능합니다!</p>
+        </div>
+        
+        <p style="margin-bottom: 0; color: #666; font-size: 0.9rem; font-style: italic;">💡 왼쪽 메뉴 바를 닫고 저장을 시도해서 pdf 파일로 증서를 얻어볼까요?</p>
     </div>
     """, unsafe_allow_html=True)
     

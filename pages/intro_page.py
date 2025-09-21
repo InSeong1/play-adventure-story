@@ -19,19 +19,21 @@ def intro_page():
         
         # 배경음악 (첫 번째 컬럼)
         with col1:
-            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/0. 인트로 지도.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=True)
+                    # BGM이 재생 중임을 표시 (adventure_map에서 연속 재생을 위해)
+                    st.session_state.intro_bgm_playing = True
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
         # 나레이션 (마지막 컬럼)
         with col3:
-            st.markdown("🎧 이야기 듣기", help="이야기 듣기")
+            st.markdown("🎧 이야기 듣기", help="- 연극 대모험에 오신 것을 환영한다는 따뜻한 인사말을 들어보세요! 모험의 시작을 알리는 특별한 이야기예요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/인트로 나레이션.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    st.audio(audio_file.read(), format="audio/mp3",autoplay=True)
             except Exception as e:
                 st.error(f"이야기 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -55,9 +57,9 @@ def intro_page():
             어서 오세요! <strong>연극 대모험</strong>에 참여하게 된 여러분을 진심으로 환영합니다.<br> 
             이 모험 속에서 여러분은 아이디어를 떠올리는 순간부터 무대에 오르는 순간까지, 
             연극의 <strong>모든 과정을 직접 경험</strong>하게 될 거예요.<br>
-            각 마을에서 주어진 활동을 하나씩 완수할 때마다 새로운 뱃지를 얻고, 다음 모험으로 나아갈 수 있습니다.<br>
-            상상력과 협동심을 발휘해 멋진 무대를 만들어 갈 준비 되었나요?<br>
-            그럼 지금부터, 연극의 세계로 함께 떠나봅시다!
+            각 마을에서 주어진 활동을 하나씩 완수할 때마다 새로운 배지를 얻고, 다음 모험으로 나아갈 수 있습니다.<br>
+            상상력과 협동심을 발휘해 멋진 무대를 만들어 갈 준비되었나요?<br>
+            그럼, 지금부터 연극의 세계로 함께 떠나봅시다!
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -67,8 +69,7 @@ def intro_page():
     if st.button("🚀 모험 시작하기", key="start_adventure", 
                 help="클릭하여 연극 대모험 지도로 이동합니다",
                 use_container_width=True):
-        # Show adventure start dialog first
-        st.session_state.show_adventure_start_dialog = True
+        # 바로 페이지 이동 (dialog 없음)
         st.session_state.current_page = "adventure_map"
         st.rerun()
 

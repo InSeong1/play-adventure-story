@@ -1,4 +1,6 @@
 import streamlit as st
+from io import BytesIO
+from pydub import AudioSegment
 from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
 import os
 import time
@@ -25,20 +27,24 @@ def village_page():
         
         # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
         with col1:
-            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/1. 시작의 마을.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    # Check if dialog was dismissed before autoplay
+                    autoplay_enabled = st.session_state.get('village_audio_ready', False)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
         
         # 초대장 듣기 (마지막 컬럼)
         with col3:
-            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            st.markdown("📜 초대장 듣기", help="- 시작의 마을에서 여러분을 따뜻하게 맞이하는 초대장을 읽어주는 친구의 목소리를 들어보세요! 이 마을에서 무엇을 할 수 있는지 알아볼 수 있어요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/1.시작의 마을.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    # Check if dialog was dismissed before autoplay
+                    autoplay_enabled = st.session_state.get('village_audio_ready', False)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
             except Exception as e:
                 st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -60,7 +66,7 @@ def village_page():
         <p style="font-size: 1.1rem; line-height: 1.6; color: #555; text-align: center;">
             안녕하세요~ 시작의 마을에 오신 여러분을 환영합니다!<br><br>
             시작의 마을에서는 여러분들이 모둠 회의를 통해 대본에 필요한 여러 가지 항목들을 함께 정하고 기록할 것입니다.<br><br>
-            그럼 시작해볼까요? 무대를 설계해 봅시다! 참! <strong>잔인한 내용이나 욕설 사용은 절대 금지입니다^^</strong>
+            그럼 시작해 볼까요? 무대를 설계해 봅시다. 참! <strong>잔인한 내용이나 욕설 사용은 절대 금지입니다^^</strong>
         </p>
     </div>
     """, unsafe_allow_html=True)

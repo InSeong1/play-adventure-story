@@ -1,4 +1,6 @@
 import streamlit as st
+from io import BytesIO
+from pydub import AudioSegment
 from utils import get_file_path, get_base64_image, render_common_menu
 import os
 
@@ -23,19 +25,23 @@ def prepare_page():
         
         # 배경음악 (첫 번째 컬럼) - 가장 먼저 렌더링
         with col1:
-            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/3. 준비의 광장.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    # Check if dialog was dismissed before autoplay
+                    autoplay_enabled = st.session_state.get('prepare_page_audio_ready', False)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
         # 초대장 듣기 (마지막 컬럼)
         with col3:
-            st.markdown("📜 초대장 듣기", help="초대장 듣기")
+            st.markdown("📜 초대장 듣기", help="- 준비의 광장에서 여러분을 격려하며 초대하는 초대장을 읽어주는 친구의 목소리를 들어보세요! 연극을 위해 어떤 준비를 할 수 있는지 알아볼 수 있어요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/3.준비의 광장.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    # Check if dialog was dismissed before autoplay
+                    autoplay_enabled = st.session_state.get('prepare_page_audio_ready', False)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
             except Exception as e:
                 st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -207,11 +213,11 @@ def prepare_page():
     st.markdown("<br><br>", unsafe_allow_html=True)
     
     # 제목과 외부 링크 버튼을 2열로 배치
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns([2, 1])
     with col1:
         st.markdown("### 📋 연극 준비 체크리스트")
     with col2:
-        st.link_button("🐉 대본 작성에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="연극 용과 함께 대본 작성을 시작해 볼까요?")
+        st.link_button("🐉 무대 준비 및 대사 연습에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="연극 용과 함께 풍성한 무대 준비를 시작해 볼까요?")
     
     st.markdown("---")
     

@@ -1,5 +1,7 @@
 import streamlit as st
 import os
+from io import BytesIO
+from pydub import AudioSegment
 from utils import get_file_path, get_base64_image, render_common_menu
 
 def adventure_map_page():
@@ -21,21 +23,25 @@ def adventure_map_page():
         # 오디오 플레이어들을 배치
         col1, col2, col3 = st.columns([1, 5, 1])
         
-        # 배경음악 (첫 번째 컬럼)
+        # 배경음악 (첫 번째 컬럼) - intro와 같은 파일 사용
         with col1:
-            st.markdown("🎵 배경음악 듣기", help="배경음악")
+            st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/0. 인트로 지도.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    # intro 페이지에서 BGM이 재생 중이었다면 연속 재생
+                    autoplay_enabled = st.session_state.get('intro_bgm_playing', False)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
+                    # BGM 상태 초기화 (다음 페이지 전환을 위해)
+                    st.session_state.intro_bgm_playing = False
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
         # 지도 설명 듣기 (마지막 컬럼)
         with col3:
-            st.markdown("🗺️ 지도 설명 듣기", help="지도 설명 듣기")
+            st.markdown("🗺️ 지도 설명 듣기", help="- 연극 대모험의 시작부터 끝까지 여정을 담은 전체 지도를 살펴보세요!")
             try:
                 with open(get_file_path("나레이션 소리 모음/지도 나레이션.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3")
+                    st.audio(audio_file.read(), format="audio/mp3",autoplay=True)
             except Exception as e:
                 st.error(f"지도 설명 파일을 불러올 수 없습니다: {str(e)}")
         

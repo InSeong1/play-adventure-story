@@ -47,6 +47,7 @@ def get_base64_image(file_path):
 
 
 
+
 def render_common_menu():
     """공통 메뉴를 렌더링하는 함수"""
     st.sidebar.title("🎭 메뉴")
