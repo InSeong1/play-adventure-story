@@ -30,9 +30,7 @@ def village_page():
             st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/1. 시작의 마을.mp3"), "rb") as audio_file:
-                    # Check if dialog was dismissed before autoplay
-                    autoplay_enabled = st.session_state.get('village_audio_ready', False)
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=True)
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -42,9 +40,7 @@ def village_page():
             st.markdown("📜 초대장 듣기", help="- 시작의 마을에서 여러분을 따뜻하게 맞이하는 초대장을 읽어주는 친구의 목소리를 들어보세요! 이 마을에서 무엇을 할 수 있는지 알아볼 수 있어요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/1.시작의 마을.mp3"), "rb") as audio_file:
-                    # Check if dialog was dismissed before autoplay
-                    autoplay_enabled = st.session_state.get('village_audio_ready', False)
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
+                    st.audio(audio_file.read(), format="audio/mp3",autoplay=True)
             except Exception as e:
                 st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
         

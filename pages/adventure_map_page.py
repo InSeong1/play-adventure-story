@@ -28,11 +28,7 @@ def adventure_map_page():
             st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/0. 인트로 지도.mp3"), "rb") as audio_file:
-                    # intro 페이지에서 BGM이 재생 중이었다면 연속 재생
-                    autoplay_enabled = st.session_state.get('intro_bgm_playing', False)
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
-                    # BGM 상태 초기화 (다음 페이지 전환을 위해)
-                    st.session_state.intro_bgm_playing = False
+                    st.audio(audio_file.read(), format="audio/mp3")
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         

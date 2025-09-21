@@ -23,8 +23,6 @@ def intro_page():
             try:
                 with open(get_file_path("브금 모음/0. 인트로 지도.mp3"), "rb") as audio_file:
                     st.audio(audio_file.read(), format="audio/mp3", autoplay=True)
-                    # BGM이 재생 중임을 표시 (adventure_map에서 연속 재생을 위해)
-                    st.session_state.intro_bgm_playing = True
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         

@@ -705,10 +705,6 @@ def dialog_dismiss_callback():
     # Set flag to trigger scroll after rerun
     st.session_state.dialog_dismissed = True
     st.session_state.scroll_to_top_after_dialog = True
-    
-    # Set audio ready flag for current page
-    current_page = st.session_state.get('current_page', 'intro')
-    st.session_state[f'{current_page}_audio_ready'] = True
 
 def render_badge_board():
     """Function to render the badge board on the right side"""
@@ -841,7 +837,6 @@ def village_dialog_callback():
     dialog_dismiss_callback()
     if st.session_state.get('current_page') == 'village':
         st.session_state.dialog_dismissed = True
-        st.session_state['village_audio_ready'] = True
 
 @st.dialog("알림", width="medium", on_dismiss=village_dialog_callback)
 def show_arrival_dialog(message: str = ""):
@@ -1107,22 +1102,6 @@ def main():
     # Initialize session state
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "intro"
-    
-    # Initialize audio ready states for all pages
-    pages_with_dialogs = ['village', 'feedback_page', 'prepare_page', 'hwanho_page', 'memory_page', 'summary_page']
-    for page in pages_with_dialogs:
-        if f'{page}_audio_ready' not in st.session_state:
-            st.session_state[f'{page}_audio_ready'] = False
-    
-    # Reset audio ready state when page changes
-    if 'previous_page' in st.session_state and st.session_state.previous_page != st.session_state.current_page:
-        # Reset audio ready state for the new page
-        current_page = st.session_state.current_page
-        if current_page in pages_with_dialogs:
-            st.session_state[f'{current_page}_audio_ready'] = False
-    
-    # Update previous page
-    st.session_state.previous_page = st.session_state.current_page
     
     # Check if dialog was dismissed and scroll to top
     if st.session_state.get('scroll_to_top_after_dialog', False):

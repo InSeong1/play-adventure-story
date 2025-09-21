@@ -28,9 +28,7 @@ def feedback_page():
             st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/2. 이야기 숲.mp3"), "rb") as audio_file:
-                    # Check if dialog was dismissed before autoplay
-                    autoplay_enabled = st.session_state.get('feedback_page_audio_ready', False)
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=True)
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -39,9 +37,7 @@ def feedback_page():
             st.markdown("📜 초대장 듣기", help="- 이야기 숲에서 여러분을 신비롭게 초대하는 초대장을 읽어주는 친구의 목소리를 들어보세요! 여기서 어떤 특별한 모험을 할 수 있는지 알아볼 수 있어요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/2.이야기 숲.mp3"), "rb") as audio_file:
-                    # Check if dialog was dismissed before autoplay
-                    autoplay_enabled = st.session_state.get('feedback_page_audio_ready', False)
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=autoplay_enabled)
+                    st.audio(audio_file.read(), format="audio/mp3",autoplay=True)
             except Exception as e:
                 st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -161,7 +157,7 @@ def feedback_page():
         with col1:
             st.markdown("### 🎭 장면별 대본 작성")
         with col2:
-            st.link_button("🐉 대본 작성에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="작성한 대본을 복사해 ‘연극용의 둥지’에 붙여넣고, 확장 기능으로 더 풍성한 활동을 경험해 보세요!")
+            st.link_button("🐉 대본 작성에 도움이 필요하다면?", "https://play-adventure-sub.streamlit.app/", help="연극 용과 함께 대본 작성을 시작해 볼까요?")
         
         st.markdown("---")
         
