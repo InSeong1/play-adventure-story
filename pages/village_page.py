@@ -1,6 +1,5 @@
 import streamlit as st
 from io import BytesIO
-from pydub import AudioSegment
 from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
 import os
 import time

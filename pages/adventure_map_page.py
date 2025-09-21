@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 from io import BytesIO
-from pydub import AudioSegment
 from utils import get_file_path, get_base64_image, render_common_menu
 
 def adventure_map_page():
