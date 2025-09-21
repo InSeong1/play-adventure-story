@@ -48,6 +48,10 @@ def get_base64_image(file_path):
 
 
 
+def should_autoplay_audio():
+    """오디오 자동재생 여부를 결정하는 함수"""
+    return st.session_state.get('dialog_dismiss_state', False)
+
 def render_common_menu():
     """공통 메뉴를 렌더링하는 함수"""
     st.sidebar.title("🎭 메뉴")

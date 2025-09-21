@@ -1,6 +1,6 @@
 import streamlit as st
 from io import BytesIO
-from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm
+from utils import get_file_path, get_base64_image, render_common_menu, generate_play_scenario, play_bgm, should_autoplay_audio
 import os
 
 def feedback_page():
@@ -27,7 +27,7 @@ def feedback_page():
             st.markdown("🎵 배경음악 듣기", help="- 배경음악이 필요할 때는 재생해 보세요. 상황에 따라 재생 속도를 조절하거나 음소거 기능도 활용할 수 있어요!")
             try:
                 with open(get_file_path("브금 모음/2. 이야기 숲.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3", autoplay=True)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=should_autoplay_audio())
             except Exception as e:
                 st.error(f"BGM 파일을 불러올 수 없습니다: {str(e)}")
         
@@ -36,7 +36,7 @@ def feedback_page():
             st.markdown("📜 초대장 듣기", help="- 이야기 숲에서 여러분을 신비롭게 초대하는 초대장을 읽어주는 친구의 목소리를 들어보세요! 여기서 어떤 특별한 모험을 할 수 있는지 알아볼 수 있어요.")
             try:
                 with open(get_file_path("나레이션 소리 모음/2.이야기 숲.mp3"), "rb") as audio_file:
-                    st.audio(audio_file.read(), format="audio/mp3",autoplay=True)
+                    st.audio(audio_file.read(), format="audio/mp3", autoplay=should_autoplay_audio())
             except Exception as e:
                 st.error(f"초대장 파일을 불러올 수 없습니다: {str(e)}")
         

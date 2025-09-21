@@ -705,6 +705,8 @@ def dialog_dismiss_callback():
     # Set flag to trigger scroll after rerun
     st.session_state.dialog_dismissed = True
     st.session_state.scroll_to_top_after_dialog = True
+    # Set dialog dismiss state to True to enable autoplay
+    st.session_state.dialog_dismiss_state = True
 
 def render_badge_board():
     """Function to render the badge board on the right side"""
@@ -1103,10 +1105,28 @@ def main():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "intro"
     
+    # Initialize dialog dismiss state for audio autoplay control
+    if 'dialog_dismiss_state' not in st.session_state:
+        st.session_state.dialog_dismiss_state = False
+    
+    # Reset dialog dismiss state when page changes (except when dialog is dismissed)
+    current_page = st.session_state.get('current_page', 'intro')
+    if 'previous_page' not in st.session_state:
+        st.session_state.previous_page = current_page
+    
+    # If page changed and it's not due to dialog dismiss, reset dialog_dismiss_state
+    if st.session_state.previous_page != current_page and not st.session_state.get('dialog_dismissed', False):
+        st.session_state.dialog_dismiss_state = False
+    
+    # Update previous page
+    st.session_state.previous_page = current_page
+    
     # Check if dialog was dismissed and scroll to top
     if st.session_state.get('scroll_to_top_after_dialog', False):
         scroll_to_top()
         st.session_state.scroll_to_top_after_dialog = False
+        # Reset dialog dismissed flag after handling
+        st.session_state.dialog_dismissed = False
     
     # Render map popup if needed (displayed on all pages)
     render_map_popup()
