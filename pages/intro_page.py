@@ -8,6 +8,7 @@ def intro_page():
     render_common_menu()
     
     # 메인 콘텐츠를 감싸는 컨테이너
+    st.markdown('# 📚 초등학교 5, 6학년 국어 📖')
     st.markdown('<div class="main-content">', unsafe_allow_html=True)
     
     # 인트로 이미지를 적절한 크기로 표시 (배경이 아닌 일반 이미지)
